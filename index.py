@@ -1,5 +1,16 @@
 #!/usr/local/bin/python3
 #-*-code:utf8-*-
+
+########################################################################
+# 设置类库路径
+########################################################################
+import sys
+path ='/git/ilv_web/lib'
+if path not in sys.path:
+    sys.path.append(path)
+
+
+
 ###################################################################################################
 # Note:
 # Please build an .pth file in site-packages directory and add path of /www/ilvLib
