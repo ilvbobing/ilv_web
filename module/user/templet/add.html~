@@ -1,0 +1,18 @@
+<!--ilv_add-->
+<script type=text/javascript src=module/js/FormAct.js></script><!--form interface-->
+<form id=form_add method=post action=ilv_action enctype=multipart/form-data>
+    <div id=div_msg>ilv_msg</div>
+    <input type=hidden name=column value=1013 />
+    会员帐号：<input id=input_account type=text name=account value='ilv_account' /><br>
+    <input id=input_title type=hidden name=title value='' />
+    会员头像：<input type=file name=icon /><br>    
+    <textarea id=textareaJoinSummary name=summary style=width:600px;height:100px;>ilv_summary</textarea><br>
+    会员密码：<input id=input_password type=password name=password value='ilv_password' /><br>
+    验证密码：<input id=input_password2 type=password value='ilv_password' /><br><br>
+    <input type=hidden name=datetime value='ilv_datetime' />
+    <input type=hidden name=millisecond value='ilv_millisecond' />
+    <input type=hidden name=ip value='ilv_ip' />
+    <input type=button onclick=FormAct.submit(form_add); value=提交 />&nbsp;&nbsp;
+    <input type=reset value=清空 />
+</form>
+<!--/ilv_edit-->

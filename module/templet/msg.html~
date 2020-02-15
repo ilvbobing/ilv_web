@@ -1,0 +1,6 @@
+Base.get_path:sup=1013,url=module/admin/css/act.css
+Base.get_path:sup=10,url=module/user/css/act.css
+Base.get_path:sup=1013,url=module/admin/templet/control.html
+Base.get_path:sup=10,url=module/user/templet/control.html
+Base.get_path:sup=1013,url=module/admin/templet/edit.html
+Base.get_path:sup=10,url=module/user/templet/edit.html
