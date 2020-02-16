@@ -2,382 +2,388 @@
 # ilv_web 开源网站
 ########################################################################
 ilv_web是一款完全开源的网站系统，主要配置如下：
-  1 操作系统：Ubuntu 18.04 LST
-  2 压缩插件：zlib-1.2.7
-  3 编制语言：Python-3.3.1
-  4 映射软件：nginx-1.5.0
-  5 解析软件：uwsgi-1.9.10
-  6 数 据 库：mysql-5.7.29
-  7 数据连接：MySQLdb-1.0.9
-  8 视频插件：libflashplayer.so
+    1 操作系统：Ubuntu 18.04 LST
+    2 压缩插件：zlib-1.2.7
+    3 编制语言：Python-3.3.1
+    4 映射软件：nginx-1.5.0
+    5 解析软件：uwsgi-1.9.10
+    6 数 据 库：mysql-5.7.29
+    7 数据连接：MySQLdb-1.0.9
+    8 视频插件：libflashplayer.so
 
-  #*********************************************************************
-  # 1 环境配置
-  #*********************************************************************
-  1、安装Ubuntu 18.04 LTS 操作系统。
-  2、安装zlib-1.2.7 这一步必须安装在Python-3.3.1前，不然会出现Importerror No module named 'zlib'
-  3、安装Python-3.3.1
-  4、安装nginx-1.5.0
-  5、安装uwsgi-1.9.10
-  6、安装MySQL-5.0.18
-  7、安装mysql-connector-python-1.0.9.tar.gz
-      sudo python3 setup.py install
-      
-    #===================================================================
-    # 1.1 配置Ubuntu 18.04 LTS
-    #===================================================================
-    测试平台为Ubuntu 18.04 LTS
-    
-    一、系统相关
-    ===========           
-    1、备份与恢复
-    >sudo -s
-    >mkdir –p /bak
-    >tar cvpzf /bak/backup.tgz --exclude=/sdb --exclude=/proc --exclude=/lost+found --exclude=/mnt --exclude=/sys –exclude=/media --exclude=/bak /
-    说明：
-    tar:用来备份的程序。
-    c - 新建一个备份文档。
-    v - 详细模式，tar程序将在屏幕上实时输出所有信息。
-    p - 保存许可，将应用到所有文件。
-    z - 采用gzip压缩备份文件，以减少备份文件的体积。
-    f - 压缩文件存放路径
-    / - 最后一个参数，我们想要保存所有东西的目录，这里用的是根目录。
-    系统恢复
-    tar -xvpzf /bak/backup.tgz -C /
-    说明：
-    x - 解开压缩文件
-    v - 详细模式，tar程序将在屏幕上实时输出所有信息。
-    p - 保存许可，将应用到所有文件。
-    z - 采用gzip解压备份文件。
-    f - 压缩文件存放路径
-    重新创建备份时被排除在外的目录
-    mkdir proc
-    mkdir lost+found
-    mkdir mnt
-    mkdir sys
-    mkdir media  
-    
-    开机启动：
-    >vi /etc/rc.local #加入启动脚本
-    source /etc/profile.d/java.sh
-    sh /usr/local/tomcat7/bin/startup.sh
-    
-    运行命令：Alt+F2
-    更改侧栏图标大小：运行gconf-editor
-    
-    2、系统修复
-    命令 修复损坏的 Ubuntu 系统 ，不用重装
-    1) 执行以下命令更新系统库和依赖
-	    sudo rm /var/lib/apt/lists/lock
-	    sudo rm /var/lib/dpkg/lock
-	    sudo rm /var/lib/dpkg/lock-frontend
-	    sudo dpkg --configure -a
-	    sudo apt clean
-	    sudo apt update --fix-missing
-	    sudo apt install -f
-	    sudo dpkg --configure -a
-	    sudo apt upgrade
-	    sudo apt dist-upgrade
-    2) 重启系统
-      sudo reboot
+    #*******************************************************************
+    # 1 环境配置
+    #*******************************************************************
+    1、安装Ubuntu 18.04 LTS 操作系统。
+    2、安装zlib-1.2.7 这一步必须安装在Python-3.3.1前，不然会出现Importerror No module named 'zlib'
+    3、安装Python-3.3.1
+    4、安装nginx-1.5.0
+    5、安装uwsgi-1.9.10
+    6、安装MySQL-5.0.18
+    7、安装mysql-connector-python-1.0.9.tar.gz
+            sudo python3 setup.py install
+            
+        #===============================================================
+        # 1.1 配置Ubuntu 18.04 LTS
+        #===============================================================
+        测试平台为Ubuntu 18.04 LTS
+        
+        一、系统相关
+        ===========                     
+        1、备份与恢复
+        >sudo -s
+        >mkdir –p /bak
+        >tar cvpzf /bak/backup.tgz --exclude=/sdb --exclude=/proc --exclude=/lost+found --exclude=/mnt --exclude=/sys –exclude=/media --exclude=/bak /
+        说明：
+        tar:用来备份的程序。
+        c - 新建一个备份文档。
+        v - 详细模式，tar程序将在屏幕上实时输出所有信息。
+        p - 保存许可，将应用到所有文件。
+        z - 采用gzip压缩备份文件，以减少备份文件的体积。
+        f - 压缩文件存放路径
+        / - 最后一个参数，我们想要保存所有东西的目录，这里用的是根目录。
+        系统恢复
+        tar -xvpzf /bak/backup.tgz -C /
+        说明：
+        x - 解开压缩文件
+        v - 详细模式，tar程序将在屏幕上实时输出所有信息。
+        p - 保存许可，将应用到所有文件。
+        z - 采用gzip解压备份文件。
+        f - 压缩文件存放路径
+        重新创建备份时被排除在外的目录
+        mkdir proc
+        mkdir lost+found
+        mkdir mnt
+        mkdir sys
+        mkdir media    
+        
+        开机启动：
+        >vi /etc/rc.local #加入启动脚本
+        source /etc/profile.d/java.sh
+        sh /usr/local/tomcat7/bin/startup.sh
+        
+        运行命令：Alt+F2
+        更改侧栏图标大小：运行gconf-editor
+        
+        2、系统修复
+        命令 修复损坏的 Ubuntu 系统 ，不用重装
+        1) 执行以下命令更新系统库和依赖
+	        sudo rm /var/lib/apt/lists/lock
+	        sudo rm /var/lib/dpkg/lock
+	        sudo rm /var/lib/dpkg/lock-frontend
+	        sudo dpkg --configure -a
+	        sudo apt clean
+	        sudo apt update --fix-missing
+	        sudo apt install -f
+	        sudo dpkg --configure -a
+	        sudo apt upgrade
+	        sudo apt dist-upgrade
+        2) 重启系统
+            sudo reboot
 
-    二、用户设置
-    ===========    
-    1、root用户
-    Ubuntu12.04默认是不允许root登录的，使用方法如下：
-    >sudo –s //输入普通用户密码，进入root权限模式。
-    >vi /etc/lightdm/lightdm.conf
-    修改配置文件（黑体为添加部分）：
-    ［SeatDefaults］
-    greeter-session=unity-greeter
-    user-session=ubuntu
-    greeter-show-manual-login=true #手工输入登陆系统的用户名和密码
-    allow-guest=false #不允许guest登录。
-    >sudo passwd root #添加root密码
-    另：
-    启动root：>sudo passwd –u root
-    关闭root：>sudo passwd –l root  
+        二、用户设置
+        ===========        
+        1、root用户
+        Ubuntu12.04默认是不允许root登录的，使用方法如下：
+        >sudo –s //输入普通用户密码，进入root权限模式。
+        >vi /etc/lightdm/lightdm.conf
+        修改配置文件（黑体为添加部分）：
+        ［SeatDefaults］
+        greeter-session=unity-greeter
+        user-session=ubuntu
+        greeter-show-manual-login=true #手工输入登陆系统的用户名和密码
+        allow-guest=false #不允许guest登录。
+        >sudo passwd root #添加root密码
+        另：
+        启动root：>sudo passwd –u root
+        关闭root：>sudo passwd –l root    
+        
+        三、文件设置
+        ===============        
+        修改文件夹权限:chmod abc file
+        文件权限 chmod a+x .
+        a:User b:Group c:other 其中r=4,w=2,x=1
+        chmod a=rwx file <==> chmod 777 file
+        chmod ug=rwx,o=x <==> chmod 771 file
+        主参数a用户，g组群，o其他，a所有人。
+        值参数r读取，w写入，x执行。
+        运算参数+添加权限，-删除权限，=使它成为唯一权限
+        修改文件夹+子文件（夹），进入目录：chmod 777 * -R，则全部子目录及文件权限改为777 
+        3、连接文件：ln -s 源文件 目标文件
+        -s:代号（symbolic）的意思
+        源文件：已经存在的文件
+        目标文件：新创建的连接
+        4、强制删除文件：rm -rf file
+        5、安装字体：/usr/share/fonts下新建文件夹Winfonts,而后粘贴字体文件。
+        
+        四、网络调置
+        ===========
+        关闭防火墙
+        ufw disable
+        永久有效：
+        开启：chkconfig iptables on
+        关闭：chkconfig iptables off
+        即时生效：
+        开启：service iptables start
+        关闭：service iptables stop
+
+        关闭socket重用和回收
+        #gedit /etc/sysctl.conf添加：
+        net.ipv4.tcp_tw_reuse = 0
+        net.ipv4.tcp_tw_recycle = 0
+        生效：
+        #sysctl -p                
+                 
+        #===============================================================
+        # 1.2 配置 zlib
+        #===============================================================
+        >>./configure
+        >>make
+        >>sudo make install
+
+        #===============================================================
+        # 1.3 配置 python
+        #===============================================================
+        1、下载http://www.python.org/ftp/python/3.3.1/Python-3.3.1.tar.xz。
+        2、安装
+        >>tar xf    Python-3.3.1.tar.xz /usr/local/        #解压到/usr/local/目录
+        >>cd /usr/local/Python-3.3.1                                 #进入Python-3.3.1目录下
+        >>./configure
+        >>make
+        >>make test                                                                    #可能会报错，但不要管它
+        >>sudo make install
+        3、测试
+        >>cd /usr/local/Python-3.3.1
+        在当前文件夹下创建一个Hello.py:
+        #Hello.py
+        print("Hello World")
+        >>./python Hello.py
+        Hello World!
+        如果出现上述内容，则安装成功。
+        
+        3、添加自建库：
+        >> cd /usr/local/lib/python3.3/site-packages
+        创建*.pth文件。比如我建的文件名为ilvbobing.pth，内容为：
+        /git/ilv_web/lib
+        
+        #===================================================================
+        # 1.4 配置 nginx
+        #===================================================================
+        
+        一、安装：
+        =========
+        1、命令:
+        ./configure --prefix=/usr/local/nginx #prefix指定安装目录。
+        如果没有安装Prce和gzip还加加上参数
+        --without-http_rewrite_module和--without-http_gzip_module
+        make
+        make install
+        2、启动：进入/usr/local/nginx/sbin下输入./nginx
+        3、重启：nginx -s reload
+        4、停止：nginx -s stop
+        5、更改权限：进入/usr/local后输入chmod 777 * -R
+        6、连接:进入目录/usr/local/nginx/sbin输入
+        ln -s ./nginx /usr/local/bin/nginx
+        
+        二、配置
+        ========        
+        /usr/local/nginx/conf/nginx.conf
+        1、修改主目录
+        Location / {
+            root /ilv_web;    # The base dir of web
+            Index index.html index.htm;
+        }
+        #===================================================================
+        # 1.5 配置 uwsgi
+        #===================================================================
+        （一）安装
+        1、准备:进入/usr/local/uwsgi-1.9.10打开Makefile将所有的python更改为python3，要不Ubuntu自带的python2.7.3会缺少python.h
+        2、命令：
+        make
+        make install(不执行也可以，好像make就全部完成了。)
+        3、连接：进入/usr/local/uwsgi-1.9.10下
+        ln -s ./uwsgi /usr/local/bin/uwsgi
+        4、配置ini文件:/www/uwsgi/setup.ini
+        [uwsgi]
+        socket = 127.0.0.1:9090
+        chdir = /www
+        module = hello
+        pythonpath = /www
+        process = 4
+        threads = 5
+        wsgi-file = index.py
+        master = true
+        max-requests = 1000
+        ;logto = /tmp/uwsgi.log
+        buffer-size = 40960
+        5、设置index.py
+        #!/usr/local/bin/python3
+        #-*-code:utf8-*-
+        def application(environ,start_response):
+                return b"Hello Word!"
+        6、启动：uwsgi --ini ./uwsgi/setup.ini
+        7、杀死：
+        pkill -9 uwsgi 强制杀死
+        pkill -1 杀死并重新读取
+        （二）部署nginx：/usr/local/nginx/conf/nginx.conf
+        location /admin/ {
+                include uwsgi_params;
+                uwsgi_pass 127.0.0.1:9090;
+        }
+        
+        #===================================================================
+        # 1.6 配置 mysql-5.7.29
+        #===================================================================
+        特别关注：如果在64位系统上安装i686的mysql版本，会出现my_print_defaults模块找不到的情况。
+        1、添加用户组和用户
+        >groupadd mysql
+        >groupdel mysql #删除
+        >useradd -g mysql mysql
+        >userdel mysql #删除
+        2、修改权限721856
+        >cd /usr/local/mysql5 #mysql5为解压位置
+        >chown -R mysql .
+        >chgrp -R mysql .
+        3、安装
+        >scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql
+        4、设置root和data
+        >chown -R root .
+        >chown -R mysql data
+        5、配置文件
+        >cp support-files/my-medium.cnf /etc/my.cnf
+        加入环境变量
+        >gedit /etc/my.cnf
+        [mysqld]
+        basedir = /usr/local/mysql
+        datadir = /usr/local/mysql/data
+        6、设置root密码
+        >bin/mysqladmin -u root password "mysql11123014"
+        7、登陆
+        >bin/mysql -uroot -pmysqlaaa230!$
+        8、启动mysql
+        >scripts/mysql_install_db --basedir=/usr/local/mysql5 --user=mysql&
+        >chown -R root .
+        >chown -R mysql data
+        >bin/mysqld_safe --basedir=/usr/local/mysql --user=mysql&
+        关闭：bin/mysqladmin -uroot -p shutdown
+        9、自动启动（？）
+        cp support-files/mysql.server /etc/init.d/mysql.server
+        4、添加密码
+        >cd ./bin
+        >mysql -u root mysql>GRANT ALLＰＲＩＶＩＬＥＧＥＳ　ＯＮ*.* TO root@localhost INDENTIFIED BY “mysqlaaa230!$”
+        登陆命令：
+        >./bin/mysql -u root -p mysqladas01
+        启动命令
+        >./bin/mysqld_safe --basedir=/usr/local/mysql5 --user=mysql&
+        停止代码
+        >./bin/mysqladmin -uroot -pmysqlaaa320!$ shutdown
+        将可执行文件加入到全局：
+        ln -s /usr/local/mysql/bin/mysql /usr/local/bin/mysql
+        导入数据:
+        >>mysql -u root -ppassword test <*.sql    #windows
+        >>mysql test <*.sql #linux
+        5、字符集
+        为了支持汉字及统一字符集，可采取如下设置：
+        [client]
+        #与MySQL链接的客户端（其中包括我们编写的应用程序）
+        default-character-set = utf8
+        [mysqld]
+        #服务器相关设置
+        default-character-set = utf8
+        character_set_server = utf8
+        #兼容V5.5设置
+        default-collation = utf8_general_ci
+
+        1、对于使用mysql -uroot -p123无法登陆的情况：Access denied for user 'root'@'localhost'
+        > gedit /etc/mysql/mysql.conf.d/mysqld.cnf
+        在文件最后一行加入：skip-grant-tables
+        重启mysql：
+        > sudo systemctl restart mysql.service
+        2、修改root密码
+        > sudo mysqladmin -uroot -p123 password
+
+
+        重新安装MySQL 5.7
+        #下面命令依次执行
+        sudo rm /var/lib/mysql/ -R # 删除数据库目录
+        sudo rm /etc/mysql/ -R #删除启动脚本、配置文件等
+        sudo apt-get autoremove mysql* --purge # 卸载mysql所有文件
+        sudo apt-get remove apparmor # 这个apparmor是在装mysql-server时装上的，和安全有关
+
+        dpkg -l |grep ^rc|awk '{print $2}' |sudo xargs dpkg -P # 清理残余mysql文件
+        sudo apt-get install mysql-server # 重新安装
+
+        #===================================================================
+        # 1.7 配置 MySQLdb-1.0.9
+        #===================================================================
+        1、MySQLdb:http://sourceforge.net/projects/mysql-python下载：MySQL-python-1.2.3.tar.gz
+        2、setuptools:http://pypi.python.org/pypi/setuptools下载：setuptools-0.6c11-py2.7.egg
+        3、修改site.cfg令mysql_config = /usr/local/mysql/bin/mysql_config
+        4、安装Python依赖包：apt-get install python-dev
+
+        安装mysql-connector-python
+        sudo python setup.py install
+        安装完毕后，使用下python3命令行下输入
+        import mysql.connector时会显示：
+        ImportError:No module named 'zlib'为什么？
+        安装zlib-1.2.7
+        ./configure
+        make
+        make install
+
+        #===================================================================
+        # 1.8 配置 flash插件
+        #===================================================================
+        添加flash插件:将libflashplayer.so拷贝到/usr/lib/mozilla/plugins/下就可以了。
+        sudo apt-get install flashplugin-installer
+        下载插件安装：
+        sudo cp libflashplayer.so /usr/lib/mozilla/plugins/
+        sudo cp -r usr/* /usr
+        1、下载国内版火狐：http://download.firefox.com.cn/releases/firefox/50.1/zh-CN/Firefox-latest-x86_64.tar.bz2
+        2、卸载ubuntu自带的火狐软件：sudo apt-get autoremove firefox firefox-branding firefox-gnome-support
+        3、解压下载好的安装包并将其移动到指定位置：
+        解压：tar jxvf Firefox-latest-x86_64.tar.bz2
+        移动：sudo mv firefox /opt
+        4、新建快捷方式
+        目录：cd /usr/share/applications
+        新建firefox.desktop文件：sudo touch firefox.desktop
+        编辑文件：sudo gedit firefox.desktop
+        [Desktop Entry]
+        Name=firefox
+        Name[zh_CN]=火狐浏览器
+        Comment=火狐浏览器
+        Exec=/opt/firefox/firefox
+        Icon=/opt/firefox/browser/chrome/icons/default/default128.png
+        Terminal=false
+        Type=Application
+        Categories=Appliction;
+        Encoding=UTF-8
+        StartupNotify=true
+    #*********************************************************************
+    # 2 安装网站
+    #*********************************************************************
+    在当前目录下新建目录htbin，修改权限为777
+    >>mkdir htbin
+    >>chmod 777 htbin
+    在/chmod下创建文件cgi.py:
+    #!/usr/local/Python-3.3.1/python
+    print("HTTP/1.0 200 OK")
+    print("Content-Type:text/html")
+    print("")
+    print("This is my cgi flie.")
+    >>chmod 777 htbin/cgi.py                                        #修改权限
+    >>./python -m http.server --cgi 8000                #开始服务器
+    强制退出快捷键：Ctrl+d
+    添加链接：
+    添加自建库：
+    在/usr/local/lib/python3.3/site-packages下创建*.pth文件。比如我建的文件名为ilvbobing.pth，内容为：
+    /www/ilvLib
     
-    三、文件设置
-    ===============    
-    修改文件夹权限:chmod abc file
-    文件权限 chmod a+x .
-    a:User b:Group c:other 其中r=4,w=2,x=1
-    chmod a=rwx file <==> chmod 777 file
-    chmod ug=rwx,o=x <==> chmod 771 file
-    主参数a用户，g组群，o其他，a所有人。
-    值参数r读取，w写入，x执行。
-    运算参数+添加权限，-删除权限，=使它成为唯一权限
-    修改文件夹+子文件（夹），进入目录：chmod 777 * -R，则全部子目录及文件权限改为777 
-    3、连接文件：ln -s 源文件 目标文件
-    -s:代号（symbolic）的意思
-    源文件：已经存在的文件
-    目标文件：新创建的连接
-    4、强制删除文件：rm -rf file
-    5、安装字体：/usr/share/fonts下新建文件夹Winfonts,而后粘贴字体文件。
-    
-    四、网络调置
-    ===========
-    关闭防火墙
-    ufw disable
-    永久有效：
-    开启：chkconfig iptables on
-    关闭：chkconfig iptables off
-    即时生效：
-    开启：service iptables start
-    关闭：service iptables stop
-
-    关闭socket重用和回收
-    #gedit /etc/sysctl.conf添加：
-    net.ipv4.tcp_tw_reuse = 0
-    net.ipv4.tcp_tw_recycle = 0
-    生效：
-    #sysctl -p        
-         
-    #===================================================================
-    # 1.2 配置 zlib
-    #===================================================================
-    >>./configure
-    >>make
-    >>sudo make install
-    #===================================================================
-    # 1.3 配置 python
-    #===================================================================
-    1、下载http://www.python.org/ftp/python/3.3.1/Python-3.3.1.tar.xz。
-    2、安装
-    >>tar xf  Python-3.3.1.tar.xz /usr/local/    #解压到/usr/local/目录
-    >>cd /usr/local/Python-3.3.1                 #进入Python-3.3.1目录下
-    >>./configure
-    >>make
-    >>make test                                  #可能会报错，但不要管它
-    >>sudo make install
-    3、测试
-    >>cd /usr/local/Python-3.3.1
-    在当前文件夹下创建一个Hello.py:
-    #Hello.py
-    print("Hello World")
-    >>./python Hello.py
-    Hello World!
-    如果出现上述内容，则安装成功。
-    
-    #===================================================================
-    # 1.4 配置 nginx
-    #===================================================================
-    
-    一、安装：
-    =========
-    1、命令:
-    ./configure --prefix=/usr/local/nginx #prefix指定安装目录。
-    如果没有安装Prce和gzip还加加上参数
-    --without-http_rewrite_module和--without-http_gzip_module
-    make
-    make install
-    2、启动：进入/usr/local/nginx/sbin下输入./nginx
-    3、重启：nginx -s reload
-    4、停止：nginx -s stop
-    5、更改权限：进入/usr/local后输入chmod 777 * -R
-    6、连接:进入目录/usr/local/nginx/sbin输入
-    ln -s ./nginx /usr/local/bin/nginx
-    
-    二、配置
-    ========    
-    /usr/local/nginx/conf/nginx.conf
-    1、修改主目录
-    Location / {
-      root /ilv_web;  # The base dir of web
-      Index index.html index.htm;
-    }
-    #===================================================================
-    # 1.5 配置 uwsgi
-    #===================================================================
-    （一）安装
-    1、准备:进入/usr/local/uwsgi-1.9.10打开Makefile将所有的python更改为python3，要不Ubuntu自带的python2.7.3会缺少python.h
-    2、命令：
-    make
-    make install(不执行也可以，好像make就全部完成了。)
-    3、连接：进入/usr/local/uwsgi-1.9.10下
-    ln -s ./uwsgi /usr/local/bin/uwsgi
-    4、配置ini文件:/www/uwsgi/setup.ini
-    [uwsgi]
-    socket = 127.0.0.1:9090
-    chdir = /www
-    module = hello
-    pythonpath = /www
-    process = 4
-    threads = 5
-    wsgi-file = index.py
-    master = true
-    max-requests = 1000
-    ;logto = /tmp/uwsgi.log
-    buffer-size = 40960
-    5、设置index.py
-    #!/usr/local/bin/python3
-    #-*-code:utf8-*-
-    def application(environ,start_response):
-        return b"Hello Word!"
-    6、启动：uwsgi --ini ./uwsgi/setup.ini
-    7、杀死：
-    pkill -9 uwsgi 强制杀死
-    pkill -1 杀死并重新读取
-    （二）部署nginx：/usr/local/nginx/conf/nginx.conf
-    location /admin/ {
-        include uwsgi_params;
-        uwsgi_pass 127.0.0.1:9090;
-    }
-    
-    #===================================================================
-    # 1.6 配置 mysql-5.7.29
-    #===================================================================
-    特别关注：如果在64位系统上安装i686的mysql版本，会出现my_print_defaults模块找不到的情况。
-    1、添加用户组和用户
-    >groupadd mysql
-    >groupdel mysql #删除
-    >useradd -g mysql mysql
-    >userdel mysql #删除
-    2、修改权限721856
-    >cd /usr/local/mysql5 #mysql5为解压位置
-    >chown -R mysql .
-    >chgrp -R mysql .
-    3、安装
-    >scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql
-    4、设置root和data
-    >chown -R root .
-    >chown -R mysql data
-    5、配置文件
-    >cp support-files/my-medium.cnf /etc/my.cnf
-    加入环境变量
-    >gedit /etc/my.cnf
-    [mysqld]
-    basedir = /usr/local/mysql
-    datadir = /usr/local/mysql/data
-    6、设置root密码
-    >bin/mysqladmin -u root password "mysql11123014"
-    7、登陆
-    >bin/mysql -uroot -pmysqlaaa230!$
-    8、启动mysql
-    >scripts/mysql_install_db --basedir=/usr/local/mysql5 --user=mysql&
-    >chown -R root .
-    >chown -R mysql data
-    >bin/mysqld_safe --basedir=/usr/local/mysql --user=mysql&
-    关闭：bin/mysqladmin -uroot -p shutdown
-    9、自动启动（？）
-    cp support-files/mysql.server /etc/init.d/mysql.server
-    4、添加密码
-    >cd ./bin
-    >mysql -u root mysql>GRANT ALLＰＲＩＶＩＬＥＧＥＳ　ＯＮ*.* TO root@localhost INDENTIFIED BY “mysqlaaa230!$”
-    登陆命令：
-    >./bin/mysql -u root -p mysqladas01
-    启动命令
-    >./bin/mysqld_safe --basedir=/usr/local/mysql5 --user=mysql&
-    停止代码
-    >./bin/mysqladmin -uroot -pmysqlaaa320!$ shutdown
-    将可执行文件加入到全局：
-    ln -s /usr/local/mysql/bin/mysql /usr/local/bin/mysql
-    导入数据:
-    >>mysql -u root -ppassword test <*.sql  #windows
-    >>mysql test <*.sql #linux
-    5、字符集
-    为了支持汉字及统一字符集，可采取如下设置：
-    [client]
-    #与MySQL链接的客户端（其中包括我们编写的应用程序）
-    default-character-set = utf8
-    [mysqld]
-    #服务器相关设置
-    default-character-set = utf8
-    character_set_server = utf8
-    #兼容V5.5设置
-    default-collation = utf8_general_ci
-
-    1、对于使用mysql -uroot -p123无法登陆的情况：Access denied for user 'root'@'localhost'
-    > gedit /etc/mysql/mysql.conf.d/mysqld.cnf
-    在文件最后一行加入：skip-grant-tables
-    重启mysql：
-    > sudo systemctl restart mysql.service
-    2、修改root密码
-    > sudo mysqladmin -uroot -p123 password
-
-
-    重新安装MySQL 5.7
-    #下面命令依次执行
-    sudo rm /var/lib/mysql/ -R # 删除数据库目录
-    sudo rm /etc/mysql/ -R #删除启动脚本、配置文件等
-    sudo apt-get autoremove mysql* --purge # 卸载mysql所有文件
-    sudo apt-get remove apparmor # 这个apparmor是在装mysql-server时装上的，和安全有关
-
-    dpkg -l |grep ^rc|awk '{print $2}' |sudo xargs dpkg -P # 清理残余mysql文件
-    sudo apt-get install mysql-server # 重新安装
-
-    #===================================================================
-    # 1.7 配置 MySQLdb-1.0.9
-    #===================================================================
-    1、MySQLdb:http://sourceforge.net/projects/mysql-python下载：MySQL-python-1.2.3.tar.gz
-    2、setuptools:http://pypi.python.org/pypi/setuptools下载：setuptools-0.6c11-py2.7.egg
-    3、修改site.cfg令mysql_config = /usr/local/mysql/bin/mysql_config
-    4、安装Python依赖包：apt-get install python-dev
-
-    安装mysql-connector-python
-    sudo python setup.py install
-    安装完毕后，使用下python3命令行下输入
-    import mysql.connector时会显示：
-    ImportError:No module named 'zlib'为什么？
-    安装zlib-1.2.7
-    ./configure
-    make
-    make install
-
-    #===================================================================
-    # 1.8 配置 flash插件
-    #===================================================================
-    添加flash插件:将libflashplayer.so拷贝到/usr/lib/mozilla/plugins/下就可以了。
-    sudo apt-get install flashplugin-installer
-    下载插件安装：
-    sudo cp libflashplayer.so /usr/lib/mozilla/plugins/
-    sudo cp -r usr/* /usr
-    1、下载国内版火狐：http://download.firefox.com.cn/releases/firefox/50.1/zh-CN/Firefox-latest-x86_64.tar.bz2
-    2、卸载ubuntu自带的火狐软件：sudo apt-get autoremove firefox firefox-branding firefox-gnome-support
-    3、解压下载好的安装包并将其移动到指定位置：
-    解压：tar jxvf Firefox-latest-x86_64.tar.bz2
-    移动：sudo mv firefox /opt
-    4、新建快捷方式
-    目录：cd /usr/share/applications
-    新建firefox.desktop文件：sudo touch firefox.desktop
-    编辑文件：sudo gedit firefox.desktop
-    [Desktop Entry]
-    Name=firefox
-    Name[zh_CN]=火狐浏览器
-    Comment=火狐浏览器
-    Exec=/opt/firefox/firefox
-    Icon=/opt/firefox/browser/chrome/icons/default/default128.png
-    Terminal=false
-    Type=Application
-    Categories=Appliction;
-    Encoding=UTF-8
-    StartupNotify=true
-  #*********************************************************************
-  # 2 安装网站
-  #*********************************************************************
-  在当前目录下新建目录htbin，修改权限为777
-  >>mkdir htbin
-  >>chmod 777 htbin
-  在/chmod下创建文件cgi.py:
-  #!/usr/local/Python-3.3.1/python
-  print("HTTP/1.0 200 OK")
-  print("Content-Type:text/html")
-  print("")
-  print("This is my cgi flie.")
-  >>chmod 777 htbin/cgi.py                    #修改权限
-  >>./python -m http.server --cgi 8000        #开始服务器
-  强制退出快捷键：Ctrl+d
-  添加链接：
-  添加自建库：
-  在/usr/local/lib/python3.3/site-packages下创建*.pth文件。比如我建的文件名为ilvbobing.pth，内容为：
-  /www/ilvLib
-  
-  #*********************************************************************
-  # 3 启动网站
-  #*********************************************************************
-  1、进入超级用户模式 sudo -s
-  1、bin/mysqld_safe --basedir=/usr/local/mysql --user=mysql&
-  2、nginx nginx -s restart
-  3、uwsgi  --ini uwsgi.ini
-  4、Http python3 setup.py
+    #*********************************************************************
+    # 3 启动网站
+    #*********************************************************************
+    1、进入超级用户模式 sudo -s
+    1、bin/mysqld_safe --basedir=/usr/local/mysql --user=mysql&
+    2、nginx nginx -s restart
+    3、uwsgi    --ini uwsgi.ini
+    4、Http python3 setup.py
