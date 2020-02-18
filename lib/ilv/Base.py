@@ -302,7 +302,7 @@ class Base(ilv.Config.Config):
   ################################################################
   # 10 get_user_row
   ################################################################
-  def get_user_row(self,user=None):  
+  def get_user_row1(self,user=None):  
     row = None
     u = user
     if u is None:
@@ -317,7 +317,7 @@ class Base(ilv.Config.Config):
   ################################################################
   # 10 get_user_row
   ################################################################
-  def get_user_row0(self,user=None):
+  def get_user_row(self,user=None):
     row = None
     u = user
     #self.add_msg("Base.get_user_row:user=%s" % str(user))

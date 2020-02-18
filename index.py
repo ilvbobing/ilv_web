@@ -5,7 +5,7 @@
 # 设置类库路径
 ########################################################################
 import sys
-path ='/git/ilv_web/lib'
+path ='/home/ilvbobing/ilv_web/lib'
 if path not in sys.path:
     sys.path.append(path)
 

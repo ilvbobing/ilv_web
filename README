@@ -377,7 +377,8 @@ ilv_web是一款完全开源的网站系统，主要配置如下：
     强制退出快捷键：Ctrl+d
     添加链接：
     添加自建库：
-    在/usr/local/lib/python3.3/site-packages下创建*.pth文件。比如我建的文件名为ilvbobing.pth，内容为：
+    在/usr/local/lib/python3.3/site-packages下创建*.pth文件。
+    比如我建的文件名为ilvbobing.pth，内容为：
     /www/ilvLib
     
     #*********************************************************************
