@@ -7,8 +7,8 @@ get_db get a database
 
 """
 
-# import ilv.db.SQLite
-import ilv.db.MySQL
+import ilv.db.SQLite
+# import ilv.db.MySQL
 
 ########################################################################
 # 获取默认数据库
