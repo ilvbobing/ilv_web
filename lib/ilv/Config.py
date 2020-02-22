@@ -23,19 +23,19 @@ class Config:
     # ================
     # 2.1 SQLite配置
     # --------------
-    # dbType = "sqlite" # 基础数据库使用SQLite
-    # dbHost = "" #也可以为：127.0.0.1
-    # dbUsr = "" # 数据库登录用户
-    # dbPsw = "" # 数据库登录密码
-    # dbName = "data/sqlite/ilv_db" # 操作数据库
+    dbType = "sqlite" # 基础数据库使用SQLite
+    dbHost = "" #也可以为：127.0.0.1
+    dbUsr = "" # 数据库登录用户
+    dbPsw = "" # 数据库登录密码
+    dbName = "data/sqlite/ilv_db" # 操作数据库
     
     # 2.2 MySQL配置
     # -------------
-    dbType = "mysql" # 基础数据库使用SQLite
-    dbHost = "localhost" #也可以为：127.0.0.1
-    dbUsr = "root" # 数据库登录用户
-    dbPsw = "" # 数据库登录密码
-    dbName = "ilv_db" # 操作数据库
+    # dbType = "mysql" # 基础数据库使用SQLite
+    # dbHost = "localhost" #也可以为：127.0.0.1
+    # dbUsr = "root" # 数据库登录用户
+    # dbPsw = "" # 数据库登录密码
+    # dbName = "ilv_db" # 操作数据库
     
 
     # 3 数据表基本参数
