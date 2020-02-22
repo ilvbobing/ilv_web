@@ -389,3 +389,34 @@ ilv_web是一款完全开源的网站系统，主要配置如下：
     2、nginx nginx -s restart
     3、uwsgi    --ini uwsgi.ini
     4、Http python3 setup.py
+    
+########################################################################
+# 有用的免费Python空间
+########################################################################
+https://www.pythonanywhere.com
+https://www.heroku.com
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

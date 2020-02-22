@@ -7,8 +7,8 @@ get_db get a database
 
 """
 
-import ilv.db.SQLite
-# import ilv.db.MySQL
+# 动态加载所需要的数据链接库
+import importlib
 
 ########################################################################
 # 获取默认数据库
@@ -24,13 +24,16 @@ def get_db(dbType="sqlite",
            dbName="data/sqlite/ilv_db"):
     db = None
     if dbType=="sqlite":
-        db = ilv.db.SQLite.SQLite(dbHost=dbHost, dbUsr=dbUsr, dbPsw=dbPsw, dbName=dbName)
+        db_lib = importlib.import_module("ilv.db.SQLite")
+        db = db_lib.SQLite(dbHost=dbHost, dbUsr=dbUsr, dbPsw=dbPsw, dbName=dbName)
     elif dbType=="mysql":
-        db = ilv.db.MySQL.MySQL(dbHost=dbHost, dbUsr=dbUsr, dbPsw=dbPsw, dbName=dbName)
+        db_lib = importlib.import_module("ilv.db.MySQL")
+        db = db_lib.MySQL(dbHost=dbHost, dbUsr=dbUsr, dbPsw=dbPsw, dbName=dbName)
     elif dbType=="Oracle":
-        db = ilv.db.MySQL.MySQL(dbHost=dbHost, dbUsr=dbUsr, dbPsw=dbPsw, dbName=dbName)
+        pass
     else:
-        db = ilv.db.SQLite.SQLite(dbHost=dbHost, dbUsr=dbUsr, dbPsw=dbPsw, dbName=dbName)
+        db_lib = importlib.import_module("ilv.db.SQLite")
+        db = db_lib.SQLite(dbHost=dbHost, dbUsr=dbUsr, dbPsw=dbPsw, dbName=dbName)
     return db
 
 ########################################################################
