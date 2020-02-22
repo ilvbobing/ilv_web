@@ -10,46 +10,38 @@ data             list                  The data of the table
 这是一个控制数据库的类
 """
 
-import os
-import sqlite3
-import ilv_db.DbBase
-
 ########################################################################
 # 基础数据方法
 ########################################################################
 #The class of MyData
-class SQLite(ilv_db.DbBase.DbBase):
+class DB_Base:
+    #*******************************************************************
+    # 一 基本属性
+    #*******************************************************************
+    
+    # 1 数据库基本参数
+    #================
+    dbHost = None # 也可以为：127.0.0.1
+    dbUsr = None # 数据库登录用户
+    dbPsw = None # 数据库登录密码
+    dbName = None # 操作数据库
+        
+    # 2 连接参数
+    col_names = None # 列名数组
+    data = None # 数据字典
+    conn = None # 链接器
+    cursor = None # 结果集
     
     #*******************************************************************
-    # 1 构造函数
+    # 1 构造函数 子类需要重载
     #*******************************************************************
     def __init__(self):
-        self.dbHost = None # sqlite 不需要数据服务器
-        self.dbUsr = None # sqlite 不需要用户名
-        self.dbPsw = None # sqlite 不需要密码
-        self.dbName = "data/sqlite/ilv_db" # 数据库名
-        self.run()
-
-    #*******************************************************************
-    # 2 连接数据库
-    #*******************************************************************
-    def run(self):
-        self.conn = sqlite3.connect(database=self.dbName)
-        self.cursor = self.conn.cursor()
         pass
         
     #*******************************************************************
-    # 3 关闭数据库
-    #*******************************************************************
-    def close(self):
-        self.cursor.close()
-        self.conn.close()
-        pass
-
-    #*******************************************************************
     # 4 导入sql文件
     #*******************************************************************
-    def executeFile(self,path="data/sqlite/setup.sql"):
+    def execute_file(self,path="data/sqlite/setup.sql"):
         sql_str = ""
         split_array = None        
         sql_array = None       
@@ -106,84 +98,170 @@ class SQLite(ilv_db.DbBase.DbBase):
                 #sql = sql.replace(x'0a','')
                 print(sql+";\r\n")
                 self.cursor.execute(sql)
+        self.conn.commit()
         #return sql_str
+
+    #*******************************************************************
+    # 1 运行数据库 需要在子类中重载
+    #*******************************************************************
+    def run(self):
+        pass
         
     #*******************************************************************
-    # 3 获得列数
+    # 10 关闭数据库
     #*******************************************************************
-    def getColumnCount(self):
-        return -1
+    def close(self):
+        if self.cursor != None:
+            self.cursor.close()
+            self.cursor = None
+        if self.conn != None:
+            self.conn.close()
+            self.conn = None
+        self.col_names = None # 列名数组
+        self.data = None # 数据字典
+        
+    #*******************************************************************
+    # 2 获得列名数组 此项需要在子类中重载
+    #*******************************************************************
+    def get_col_names(self):
+        pass
+
+    #*******************************************************************
+    # 2 获得列数
+    #*******************************************************************
+    def get_column_count(self):
+        if self.col_names:
+            return(len(self.col_names))
+        else:
+            return -1
         
     #*******************************************************************
     # 4 获得行数
     #*******************************************************************
-    def getRowCount(self):
+    def get_row_count(self):
         return(len(self.data))
     
     #*******************************************************************
     # 5 获得列的索引
     #*******************************************************************
-    def getColumnIndex(self,cName=""):
-        return -1
+    def get_column_index(self,cName=""):
+        columnIndex = -1
+        if self.col_names is None:
+            return -1
+        i = -1
+        for columnName in self.col_names:
+            i += 1
+            if columnName == cName:
+                columnIndex = i
+                break
+        return columnIndex
+        pass
 
     #*******************************************************************
     # 6 获取单元格数值
     #*******************************************************************
-    def getValueAt(self,row=-1,column=-1):
-        return None
-
-    #*******************************************************************
-    # 7 获取单元格数值
-    #*******************************************************************
-    def connect(self):
-        return None
+    def get_value_at(self,row=-1,column=-1):
+        if row==-1 or row>=self.getRowCount(self):
+            return
+        if column==-1 or column>=self.getColumnCount(self):
+            return
+        rowData = self.data[row]
+        return rowData[column]
 
     #*******************************************************************
     # 8 变更sql语句
     #*******************************************************************
     def execute(self,sql = None):
-        pass
+        if sql is None:
+            return
+        self.cursor.execute(sql)
+        self.conn.commit()
         
     #*******************************************************************
     # 9 查询sql语句
     #*******************************************************************
-    def executeQuery(self,sql = None):
-        return       
-
-
+    def execute_query(self,sql = None):
+        if sql is None:
+            return
+        self.cursor.execute(sql)
+        
     #*******************************************************************
     # 11 获得行数组
     #*******************************************************************
-    def getRowList(self):
-        return None
+    def get_row_list(self):
+        results = []
+        for result in self.cursor:
+            results.append(result)
+        return results
         
-    ##################################################
-    # 获得列字典集
-    ##################################################
-    def getRowDicts(self):
-        return None
-
     ##################################################
     # 获得列的值
     ##################################################
     def get(self,row=None,cName=""):
-        return None
+        cValue = ""
+        if row is None:
+            return "MyData.get(row,cName)参数row不能为None"
+        if cName == "":
+            return "MyData.get(row,cName)cName不能为空"
+        cIndex = self.getColumnIndex(cName=cName)
+        if cIndex!=-1:
+            return row[cIndex]
+        return cValue
+        pass
 
     ##################################################
     # 获得指定行的字典
     ##################################################
     def get_row(self,dtname="item",kid="",cname="kid"):
-        return None
+        row_dict = {}
+        sql = "SELECT * FROM %s WHERE `%s`='%s'" % (dtname,cname,kid)
+        print("DB_Base.get_row:sql="+sql+";\r\n")
+        self.cursor.execute(sql)
+        col_name_list = self.get_col_names()
+        col_value_list = self.cursor.fetchone()
+        i = 0
+        while i < len(col_name_list):
+            row_dict[col_name_list[i]] = col_value_list[i]
+            i+=1
+        return row_dict
  
-    #*******************************************************************
-    # 根据指定的索引，获得列
-    #*******************************************************************
-    def getRow(self,dtname="column",kid="",cname="kid"):
-        return None
-
     ##################################################
     # 获得行字典集
     ##################################################
-    def getRowDict(self,row=None):
-        return None
+    def get_row_dict(self,row=None):
+        row_dict = {}
+        col_names = self.get_col_names()
+        i = -1
+        for c in row:
+            i += 1
+            row_dict[col_names[i]] = row[i]
+        return row_dict
+        pass
+
+    ##################################################
+    # 获得列字典集
+    ##################################################
+    def get_row_dicts(self):
+        rowDicts = []
+        for result in self.cursor:
+            rowDict = self.get_row_dict(row=result)
+            rowDicts.append(rowDict)
+        return rowDicts
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    

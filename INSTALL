@@ -107,6 +107,31 @@
         /home/ilvbobing/ilv_web$ sudo pkill -9 nginx
         重启nginx：
         /home/ilvbobing/ilv_web$ sudo nginx -s restart
+
+        #===============================================================
+        # 1.1.5 mysql-5.7
+        #===============================================================
+        如果使用的是SQLite数据库，此项可不操作
+        1、安装mysql-5.7
+        ================
+        /home/ilvbobing/ilv_web$ sudo apt-get update
+        /home/ilvbobing/ilv_web$ sudo apt-get install mysql-server
+        
+        2、设置mysql在命令行中可用
+        =========================
+        /home/ilvbobing/ilv_web$ sudo gedit /etc/mysql/mysql.conf.d/mysqld.cnf
+        在最后一行添加：skip-grant-tables，而后重启mysql
+        /home/ilvbobing/ilv_web$ sudo systemctl restart mysql.service
+        
+        
+        3、导入初始数据库
+        =================
+        /home/ilvbobing/ilv_web$ mysql < data/mysql/setup.sql
+        
+        4、安装 mysql-connector-python
+        ==============================
+        /home/ilvbobing/ilv_web$ sudo apt-get update
+        /home/ilvbobing/ilv_web$ sudo apt-get install python3-mysql.connector
         
 ########################################################################
 # 2 网站基本配置

@@ -9,8 +9,6 @@ path ='/home/ilvbobing/ilv_web/lib'
 if path not in sys.path:
     sys.path.append(path)
 
-
-
 ###################################################################################################
 # Note:
 # Please build an .pth file in site-packages directory and add path of /www/ilvLib
@@ -19,7 +17,6 @@ if path not in sys.path:
 # I have build a file named ilvbobing.pth in /usr/local/lib/python3.3/site-packages
 # And the content of ilvbobing.pth maybe: /www/ilvLib
 ###################################################################################################
-import ilv.MyData
 import ilv.Base
 import ilv.User
 import ilv.News

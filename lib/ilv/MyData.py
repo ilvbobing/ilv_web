@@ -48,6 +48,7 @@ class MyData(ilv.Config.Config):
             return(len(self.columnNames))
         else:
             return -1
+
     ##################################################
     # 获得列的索引
     ##################################################

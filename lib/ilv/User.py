@@ -6,10 +6,9 @@
 3.The other class (for exampe Microblog) is the child of MyBase
 """
 # python library
-import os,datetime,mysql.connector
+import os,datetime
 
 import ilv.Base
-import ilv.MyData
 ####################################################################################################
 # User
 ####################################################################################################

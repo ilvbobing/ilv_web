@@ -8,13 +8,13 @@
 3.The other class (for exampe Microblog) is the child of MyBase
 """
 # python library
-import os,datetime,mysql.connector,struct,stat
-# user library
+import os,datetime,struct,stat
 import ilv.Env
-import ilv.MyData
 import ilv.Config
 import ilv.Time
-####################################################################################################
+import ilv.db.DB_Factory
+
+########################################################################
 # Base 基础网页 是页面拓展的基础类
 # 主要分以下几层：
 # 一、操作层：control 浏览 添加 删除 编辑 查找 统计 登陆 注消
@@ -22,21 +22,22 @@ import ilv.Time
 # (一)闪动照片 getShine (二)最近更新 getRecent
 # 三、分栏层：subfield 分栏显示
 # 四、列表层：list 列表显示
-####################################################################################################
+########################################################################
 class Base(ilv.Config.Config):
-  ################################################################################################
+  ######################################################################
   # 一 基本属性
-  ################################################################################################
+  ######################################################################
   urlDict = {} # 地址栏参数字典
   postDict = {} # 表单参数字典
   msg = "" # process message,usually is error
   PARAS = {} # 基本参数集，用于存放常用参数
-  ################################################################################################
+
+  #######################################################################
   # II pre method
   # 1 construct method
   # 2 get_url find the url from sup until finded
   # 3 getTemplet get the html of templet
-  ################################################################################################
+  ######################################################################
   ################################################################
   # 1 constructor 构造函数
   ################################################################
@@ -49,6 +50,8 @@ class Base(ilv.Config.Config):
     self.postDict = env.getFormDicts() # 获取网页表单参数
     self.env = env # 获取网页请求环境变量
     self.init_paras()
+    self.db = ilv.db.DB_Factory.get_db(self.dbType, self.dbHost, self.dbUsr, self.dbPsw, self.dbName) # 默认使用SQLite数据库
+    
     # init log file
     log_dir = self.LOG_DIR # 从Config继承：module/templet/
     log_msg = self.LOG_MSG # 从Config继承：module/templet/msg.html
@@ -152,9 +155,10 @@ class Base(ilv.Config.Config):
     idx = 0
     while idx<=10: # recycle only 10 times
       idx += 1
-      md = ilv.MyData.MyData()
-      sup_row = md.get_row(self.dtColumn,sup)
-      md.close()
+      self.db.run()
+      sup_row = self.db.get_row(dtname=self.dtColumn, kid=sup)
+      self.db.close()
+
       if sup_row is None:
         sup = self.PARAS["sup"]
         continue
@@ -185,9 +189,9 @@ class Base(ilv.Config.Config):
     if dtname_row is not None:
       dtname = dtname_row["dtname"] # column
       # 1 default row
-      md = ilv.MyData.MyData()
-      row = md.get_row(dtname,self.PARAS[name])
-      md.close()
+      self.db.run()
+      row = self.db.get_row(dtname,self.PARAS[name])
+      self.db.close()
       if kid is None:
         kid = self.get_para(name)
       if kid==self.PARAS[name]:
@@ -195,9 +199,9 @@ class Base(ilv.Config.Config):
         pass
       else:
         # self.urlDic[name]!=self.PARAS[name]
-        md = ilv.MyData.MyData()
-        aim_row = md.get_row(dtname,kid) # None
-        md.close()
+        self.db.run()
+        aim_row = self.db.get_row(dtname,kid) # None
+        self.db.close()
         if aim_row is not None:
           row = aim_row
         else:
@@ -307,12 +311,12 @@ class Base(ilv.Config.Config):
     u = user
     if u is None:
       u = self.get_para("u")
-    md = ilv.MyData.MyData()
-    row = md.get_row(dtname=self.dtUser,kid=u)
+    self.db.run()
+    row = self.db.get_row(dtname=self.dtUser,kid=u)
     # 如果没有取出，则显示出错信息。
     if row is None:
       self.add_msg("Base.get_user_row(user=%s):row=%s" % (str(u),str(row)))
-    md.close()
+    self.db.close()
     return row
   ################################################################
   # 10 get_user_row
@@ -325,9 +329,7 @@ class Base(ilv.Config.Config):
       u = self.get_para("u")
     # 1 set default row
     # 三个参数：1, 1013,u
-    row = self.get_row(self.PARAS["u"],self.USER_SUP,"u")
-       
-    self.add_msg("Base.get_user_row:row=%s" % str(row))
+    row = self.get_row(self.PARAS["u"],self.USER_SUP,"u")  
     user_row = self.get_row(u,self.USER_SUP,"u")
     if user_row is not None:
       u = str(user_row["kid"])
@@ -344,10 +346,10 @@ class Base(ilv.Config.Config):
         sql += " and `ip`='%s'" % ip
         sql += " order by `datetime` desc"
         sql += " limit 1"
-        md = ilv.MyData.MyData()
-        md.executeQuery(sql)
-        rows = md.getRowDicts()
-        md.close() 
+        self.db.run()
+        self.db.execute_query(sql)
+        rows = self.db.get_row_dicts()
+        self.db.close() 
         if len(rows)>0:
           # user have loginned some time ago
           row = rows[0]
@@ -405,10 +407,10 @@ class Base(ilv.Config.Config):
       sql += " where `item`='%s'" % sup
       sql += " and `level`='1'"
       sql += " order by `sid` asc"
-      md = ilv.MyData.MyData()
-      md.executeQuery(sql)
-      rows = md.getRowDicts()
-      md.close()
+      self.db.run()
+      self.db.execute_query(sql)
+      rows = self.db.get_row_dicts()
+      self.db.close()
       # 3 判断当前选项是否被选择
       selectedStr = ""
       if str(sup)==str(self.get_para("sup")):
@@ -474,7 +476,7 @@ class Base(ilv.Config.Config):
     # 1 set sup user
     sup_row = self.get_para("sup_row")
     user_row = self.get_para("user_row")
-    # 2 set title
+    # 2 set title 需要拓展
     title = sup_row["title"] + "--" + self.title + " " + self.revision
     # 3 set style
     css_head = self.get_path("css/head.css")
@@ -511,7 +513,6 @@ class Base(ilv.Config.Config):
   ############################################################################################
   def get_menu_htm(self):
     html = ""
-    md = ilv.MyData.MyData()
     sup_row = self.get_para("sup_row")
     sup = str(sup_row["kid"])
     # 查阅当前的所有子类
@@ -523,8 +524,10 @@ class Base(ilv.Config.Config):
     if user_row["account"]!="admin":
       sql += " and `level`='1'"
     sql += " order by `sid` asc"
-    md.executeQuery(sql)
-    subRows = md.getRowDicts()
+    self.db.run()
+    self.db.execute_query(sql)
+    subRows = self.db.get_row_dicts()
+    self.db.close()
     paras = {}
     paras["sup"] = 10
     paras["act"] = "view"
@@ -550,10 +553,10 @@ class Base(ilv.Config.Config):
     sql += " where `hire`>=3"
     sql += " order by `datetime` desc"
     sql += " limit 1"
-    md.run()
-    md.executeQuery(sql)
-    rows = md.getRowDicts()
-    md.close()
+    self.db.run()
+    self.db.execute_query(sql)
+    rows = self.db.get_row_dicts()
+    self.db.close()
     if len(rows)>0:
       row = rows[0]
       action = self.get_action({"act":"show","aim":row["kid"]})
@@ -657,9 +660,9 @@ class Base(ilv.Config.Config):
         sql += " set `%s`='%s'" % (key,value)
         sql += " where `kid`='%s'" % str(aim_row["kid"])
         sql += " limit 1"
-        md = ilv.MyData.MyData()
-        md.execute(sql)
-        md.close()
+        self.db.run()
+        self.db.execute(sql)
+        self.db.close()
       else:
         self.add_msg("Base.hire(act=%s,aim=%s,sup=%s):\
           dtname=%s is not in self.DT_TABLES" \
@@ -727,9 +730,9 @@ class Base(ilv.Config.Config):
     if succeed and sup=="1015" and act=="add":
       account = self.postDict["account"][0]["value"]
       password = self.postDict["password"][0]["value"]
-      md = ilv.MyData.MyData()
-      user_row = md.getRow(self.dtUser,account,"account")
-      md.close()
+      self.db.run()
+      user_row = self.db.get_row(self.dtUser,account,"account")
+      self.db.close()
       if user_row is None:
         msg += "帐号%s不存在。" % account
         self.add_msg(msg)
@@ -741,16 +744,16 @@ class Base(ilv.Config.Config):
         sql += " where `account`='%s'" % account
         sql += " and `password`='%s'" % password
         sql += " limit 1"
-        md.run()
-        md.executeQuery(sql)
-        users = md.getRowDicts()
+        self.db.run()
+        self.db.execute_query(sql)
+        users = self.db.get_row_dicts()
         if len(users)<1:
           msg += "帐号%s与密码不匹配" % account
           self.add_msg(msg)
           succeed = False
         else:
           paras["u"] = user_row["kid"]
-      md.close()
+      self.db.close()
     # 2 读取表单数据
     if succeed:
       html += "<br>"+str(self.postDict)+"<br>"
@@ -767,9 +770,9 @@ class Base(ilv.Config.Config):
           kid = int(self.postDict[self.dtColumn][0]["value"])*100 + int(kid) - 1
           while not canUse:
             kid += 1
-            md = ilv.MyData.MyData()
-            row = md.getRow(dtname,str(kid))
-            md.close()
+            self.db.run()
+            row = self.db.get_row(dtname,str(kid))
+            self.db.close()
             if row is None:
               canUse = True
           self.postDict["kid"][0]["value"] = str(kid)
@@ -810,9 +813,9 @@ class Base(ilv.Config.Config):
       # 2.4 write data
       if sql is not None:
         html += sql + "<br>"
-        md = ilv.MyData.MyData()
-        md.execute(sql)
-        md.close()
+        self.db.run()
+        self.db.execute(sql)
+        self.db.close()
     # 3 goto the new html
     if succeed:
       return self.goto(action=self.get_action(paras=paras))
@@ -913,9 +916,9 @@ class Base(ilv.Config.Config):
     if succeed and sup=="1015" and act=="add":
       account = self.postDict["account"][0]["value"]
       password = self.postDict["password"][0]["value"]
-      md = ilv.MyData.MyData()
-      user_row = md.getRow(self.dtUser,account,"account")
-      md.close()
+      self.db.run()
+      user_row = self.db.get_row(self.dtUser,account,"account")
+      self.db.close()
       if user_row is None:
         msg += "帐号%s不存在。" % account
         self.add_msg(msg)
@@ -927,16 +930,16 @@ class Base(ilv.Config.Config):
         sql += " where `account`='%s'" % account
         sql += " and `password`='%s'" % password
         sql += " limit 1"
-        md.run()
-        md.executeQuery(sql)
-        users = md.getRowDicts()
+        self.db.run()
+        self.db.execute_query(sql)
+        users = self.db.get_row_dicts()
         if len(users)<1:
           msg += "帐号%s与密码不匹配" % account
           self.add_msg(msg)
           succeed = False
         else:
           paras["u"] = user_row["kid"]
-      md.close()
+      self.db.close()
     # 2 读取表单数据
     if succeed:
       html += "<br>"+str(self.postDict)+"<br>"
@@ -953,9 +956,9 @@ class Base(ilv.Config.Config):
           kid = int(self.postDict[self.dtColumn][0]["value"])*100 + int(kid) - 1
           while not canUse:
             kid += 1
-            md = ilv.MyData.MyData()
-            row = md.getRow(dtname,str(kid))
-            md.close()
+            self.db.run()
+            row = self.db.get_row(dtname,str(kid))
+            self.db.close()
             if row is None:
               canUse = True
           self.postDict["kid"][0]["value"] = str(kid)
@@ -996,9 +999,9 @@ class Base(ilv.Config.Config):
       # 2.4 write data
       if sql is not None:
         html += sql + "<br>"
-        md = ilv.MyData.MyData()
-        md.execute(sql)
-        md.close()
+        self.db.run()
+        self.db.execute(sql)
+        self.db.close()
     # 3 goto the new html
     if succeed:
       return self.goto(action=self.get_action(paras=paras))
@@ -1033,10 +1036,10 @@ class Base(ilv.Config.Config):
           sql += " and `%s` like '%%%s%%'" % (skey,svalue)
         html = html.replace("ilv_svalue",str(svalue))
         #sql += " limit 25"
-        md = ilv.MyData.MyData()
-        md.executeQuery(sql)
-        rows = md.getRowDicts()
-        md.close()
+        self.db.run()
+        self.db.execute_query(sql)
+        rows = self.db.get_row_dicts()
+        self.db.close()
         paras = {}
         # set the page
         page = int(self.get_para("page"))
@@ -1073,10 +1076,10 @@ class Base(ilv.Config.Config):
         page_html += "<a href=%s>末页</a>&nbsp;&nbsp;" \
           % self.get_action({"page":total_page})
         page_html += "</div><!--/div_page-->"
-        md.run()
-        md.executeQuery(sql)
-        rows = md.getRowDicts()
-        md.close()
+        self.db.run()
+        self.db.execute_query(sql)
+        rows = self.db.get_row_dicts()
+        self.db.close()
         
         tmp_html = ""
         for row in rows:
@@ -1150,10 +1153,10 @@ class Base(ilv.Config.Config):
     sql += " and `image` like '%.jpg'"
     sql += " order by `kid` desc"
     sql += " limit 5"
-    md = ilv.MyData.MyData()
-    md.executeQuery(sql)    
-    rows = md.getRowDicts()
-    md.close()
+    self.db.run()
+    self.db.execute_query(sql)    
+    rows = self.db.get_row_dicts()
+    self.db.close()
     idx = 0
     srcs = ""
     hrefs = ""
@@ -1178,11 +1181,11 @@ class Base(ilv.Config.Config):
     html = ""
     sup = self.get_para("sup")
     recentHtml = self.get_templet("recent")
-    md = ilv.MyData.MyData()
+    self.db.run()
     sql = "select * from `news` order by `kid` desc limit 10"
-    md.executeQuery(sql)
-    rows = md.getRowDicts()
-    md.close()
+    self.db.execute_query(sql)
+    rows = self.db.get_row_dicts()
+    self.db.close()
     for row in rows:
       tmpStr = recentHtml
       action = self.get_action({"sup":sup,"act":"show","aim":row["kid"]})
@@ -1203,7 +1206,7 @@ class Base(ilv.Config.Config):
     html_right = html_right.replace("ilv_zgw_action",action)
     sup = self.get_para("sup")
     html = self.get_templet("tab")
-    md = ilv.MyData.MyData()
+    self.db.run()
     sql = ""
     sql += " select * from `%s`" % self.dtColumn
     sql += " where `level`='1'"
@@ -1212,9 +1215,9 @@ class Base(ilv.Config.Config):
     sql += " or `%s` like '1025%%')" % self.dtColumn
     sql += " order by `kid` asc"
     sql += " limit 10"
-    md.executeQuery(sql)
-    rows = md.getRowDicts()
-    md.close()
+    self.db.execute_query(sql)
+    rows = self.db.get_row_dicts()
+    self.db.close()
     rowIdx = 0
     paras = {}
     for row in rows:
@@ -1233,10 +1236,10 @@ class Base(ilv.Config.Config):
       sql += " where `item` like '%s%%'" % row["kid"]
       sql += " order by `kid` desc"
       sql += " limit 10"
-      md.run()
-      md.executeQuery(sql)      
-      news_rows = md.getRowDicts()
-      md.close()
+      self.db.run()
+      self.db.execute_query(sql)      
+      news_rows = self.db.get_row_dicts()
+      self.db.close()
       tab_content = ""
       for news_row in news_rows:
         paras["act"] = "show"
@@ -1262,16 +1265,16 @@ class Base(ilv.Config.Config):
     sup = self.PARAS["sup"]
     if self.urlDict and "sup" in self.urlDict and self.urlDict["sup"]:
       sup = self.urlDict["sup"]
-    md = ilv.MyData.MyData()
+    self.db.run()
     sql = ""
     sql += " select * from `item`"
     sql += " where `item`='%s'" % sup
     sql += " and `level`='1'"
     sql += " order by `sid` asc"
     sql += " limit 6"
-    md.executeQuery(sql)
-    rows = md.getRowDicts()
-    md.close()
+    self.db.execute_query(sql)
+    rows = self.db.get_row_dicts()
+    self.db.close()
     idx = 0
     for row in rows:
        idx += 1
@@ -1306,7 +1309,7 @@ class Base(ilv.Config.Config):
       return "单个分栏中row为None"
     sup = row["kid"] # 获得需要查阅的栏目kid
     name = "news"
-    md = ilv.MyData.MyData()
+    self.db.run()
     sql = ""
     sql += " select * from `%s`" % name
     sql += " where `item` like '%s%%'" % sup
@@ -1314,9 +1317,9 @@ class Base(ilv.Config.Config):
     sql += " order by `datetime` desc"
     sql += " limit 10"
     # html += "<div class=rowSolid>sql语句为："+sql+"。</div>"
-    md.executeQuery(sql)
-    rows = md.getRowDicts()
-    md.close()
+    self.db.execute_query(sql)
+    rows = self.db.get_row_dicts()
+    self.db.close()
     for row in rows:
       kid = row["kid"]
       sup = row[self.dtColumn]
