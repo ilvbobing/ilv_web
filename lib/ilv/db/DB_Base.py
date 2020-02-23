@@ -95,7 +95,7 @@ class DB_Base:
                     old_sql = new_sql
                     new_sql = old_sql.replace('  ',' ')
                 sql = new_sql
-                #sql = sql.replace(x'0a','')
+                # sql = sql.replace(x'0a','')
                 print(sql+";\r\n")
                 self.cursor.execute(sql)
         self.conn.commit()
@@ -215,7 +215,7 @@ class DB_Base:
     def get_row(self,dtname="item",kid="",cname="kid"):
         row_dict = {}
         sql = "SELECT * FROM %s WHERE `%s`='%s'" % (dtname,cname,kid)
-        print("DB_Base.get_row:sql="+sql+";\r\n")
+        # print("DB_Base.get_row:sql="+sql+";\r\n")
         self.cursor.execute(sql)
         col_name_list = self.get_col_names()
         col_value_list = self.cursor.fetchone()

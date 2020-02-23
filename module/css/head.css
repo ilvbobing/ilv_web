@@ -14,7 +14,7 @@ body {
   scrollbar-fase-color:red;                      /*滚动条方向前头颜色：红色*/
   scrollbar-arrow-color:black;                   /*滚动条方向前头颜色：红色*/
   scrollbar-base-color:darkred;                  /*滚动条基准颜色：*/
-  background-image:url(../images/bj.jpg);
+  /*background-image:url(../images/bj.jpg);*/
   background-repeat:no-repeat;
   background-position:center 0px;
 }
@@ -91,10 +91,10 @@ table{
 #div_topTag{
   width:100%;overflow:hidden;/*overflow:hidden;text-overflow:ellipsis; 文字溢出不换行，用...表示*/
   /*display:inline; 强制左右结点在同一行*/
-  text-align:center;
+  text-align:justify;
   color:red;
   background:#1F3B45;
-  border-bottom:3px solid #EE1D30;
+  border-bottom:5px solid #EE1D30;
 }
 #div_body{                                      /*主体外框*/
   background:#FFFFFF;

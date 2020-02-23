@@ -10,8 +10,8 @@
   /*width:100%;height:100px;overflow:hidden;text-overflow:ellipsis; 文字溢出不换行，用...表示*/
   /*display:inline; 强制左右结点在同一行*/
   width:100%;height:246px;overflow:hidden;
-  text-align:center;
-  color:red;
+  text-align:left;
+  color:black;
   background:#FFFFFF;
   border-bottom:0px solid #000;
 }
