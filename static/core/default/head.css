@@ -15,6 +15,7 @@ body {
   scrollbar-arrow-color:black;                   /*滚动条方向前头颜色：红色*/
   scrollbar-base-color:darkred;                  /*滚动条基准颜色：*/
   /*background-image:url(../images/bj.jpg);*/
+  background-color:#DED38C;
   background-repeat:no-repeat;
   background-position:center 0px;
 }
@@ -96,7 +97,7 @@ table{
 }
 #div_body{                                      /*主体外框*/
   background:#FFFFFF;
-  width:1000px;                                    /*宽度100%*/
+  width:500px;                                    /*宽度100%*/
   text-align:left;
   overflow:hidden;
   position:relative;top:5px;

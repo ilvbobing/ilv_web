@@ -17,12 +17,9 @@ if path not in sys.path:
 # I have build a file named ilvbobing.pth in /usr/local/lib/python3.3/site-packages
 # And the content of ilvbobing.pth maybe: /www/ilvLib
 ###################################################################################################
-import ilv.Base
-import ilv.User
-import ilv.News
+import ilv.core.web
 import ilv.Demo # 演示类
-import ilv.Env # 环境类，必须引用，保持数据一致，因为getFormDict只能引用一次，之后就无效了。
-import ilv.Column
+import ilv.core.env # 环境类，必须引用，保持数据一致，因为getFormDict只能引用一次，之后就无效了。
 ###################################################################################################
 # The entrance of uWSGI
 ###################################################################################################
@@ -30,8 +27,8 @@ def  application(environ,start_response):
     ###################################################################################################
     # 基本参数
     ###################################################################################################
-    env = ilv.Env.Env(environ=environ)
-    base = ilv.Base.Base(env=env)
+    env = ilv.core.env.Env(environ=environ)
+    base = ilv.core.web.Web(env=env)
     urlDict = base.urlDict
     ###################################################################################################
     # 获得参数集

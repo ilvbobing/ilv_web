@@ -61,23 +61,22 @@
       AIE_shw("imgdivid",
       ["<img id=imgdivid_0 src=img/2.jpg width=200 height=150 style=display:none; border=0 />",
        "<img id=imgdivid_1 src=img/3.jpg width=200 height=150 style=display:none; border=0 />"],
-      ["图片1","图片2"]);
+      ["图片渐显图片1","图片渐显图片2"]);
     </script> 
   </td>
   <td align=center><!--图片渐显改进版-->
     <div id=imgdivid2 style=width:200px;height:180px;overflow:hidden>
     </div>
     <script type=text/javascript>
-      AIE_shw2("imgdivid2",["img/1.jpg","img/2.jpg"],["<br />图片1","<br />图片2"],200,150);
+      AIE_shw2("imgdivid2",["img/1.jpg","img/2.jpg"],["图片渐显改进版图片1","图片渐显改进版图片2"],200,150);
     </script> 
   </td>
   <td align=center><!--使用类实现图片渐显-->
-    <div id=imgdivid3 style=width:200px;height:180px;overflow:hidden;>
-    </div><!--参数：外框id,图片宽,图片高,图片源集,链接集,标题集-->
+    <div id=imgdivid3 style="width:200px;height:180px;overflow:hidden;"></div><!--参数：外框id,图片宽,图片高,图片源集,链接集,标题集-->
     <script type=text/javascript>
       AIE.startSah("imgdivid3",
       ["<img id=imgdivid3_0 src=img/2.jpg width=200 height=150 border=0 />","<img id=imgdivid3_1 src=img/3.jpg width=200 height=150 border=0 />"],
-      ["href=AIE.htm","href=AIE.htm"],["<br />图片1","<br />图片2"]);
+      ["href=AIE.htm","href=AIE.htm"],["<br />类图片1","<br />类图片2"]);
     </script>
   </td>
   <td>
@@ -89,7 +88,7 @@
 	var objDiv = document.getElementById("AIE_Shine23");  
 	objDiv.srcs = ["src=img/1.jpg", "src=img/2.jpg", "src=img/3.jpg"];
 	objDiv.hrefs = ["href=?1","href=?2","herf=?3"];
-	objDiv.tts = ["图片一","图片二","图片三"];
+	objDiv.tts = ["shine图片一","shine图片二","shine图片三"];
 	objDiv.sizes = ["200","150","20","15"];
     
     objDiv.packFrame = AIE_shineFrame23;    
