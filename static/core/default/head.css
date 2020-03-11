@@ -99,7 +99,7 @@ table{
 }
 #div_body{                                      /*主体外框*/
   background:#FFFFFF;
-  width:500px;                                    /*宽度100%*/
+  width:100%;                                    /*宽度100%*/
   text-align:left;
   overflow:hidden;
   position:relative;top:5px;

@@ -53,7 +53,7 @@ git
 # git修改远程仓库地址
 ########################################################################
 方法1.修改命令
-git remote set-url origin <url>
+git remote set-url origin <url>https://github.com/ilvbobing/ilv_web
 
 方法2.先删后加
 git remote rm origin
