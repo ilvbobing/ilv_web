@@ -16,7 +16,7 @@ AEM.show = function(swfDir,menusZh,menusUrl){
     embedHtml = '<embed src='+swfDir+' wmode=opaque'
         + ' FlashVars="menusZh='+menusZh+'&menusUrl='+menusUrl+'"'
         + ' menu=false bgcolor=F0F0F0 quality=high width=900 height=40 allowScriptAccess=sameDomain'
-        + ' style="border:1px solid red;width:900px;height:40px;"'
+        + ' style="border:0px solid red;width:900px;height:40px;"'
         + ' type=application/x-shockwave-flash'
         + ' pluginspage=http://www.macromedia.com/go/getflashplayer>'
         + '</embed>';

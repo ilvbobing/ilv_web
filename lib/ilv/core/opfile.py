@@ -52,6 +52,15 @@ class Opfile:
         path += self.mode + "/"
         if os.path.exists(path+file_name):
             path += file_name
+            return path
+            pass
+        # 从static/core/default/下寻找
+        path = ""
+        path += self.dir_static
+        path += self.plat + "/"
+        path += "default/"
+        if os.path.exists(path+file_name):
+            path += file_name
         else:
             path = "static/core/default/error.htm"
         return path

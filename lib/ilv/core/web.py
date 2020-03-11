@@ -49,7 +49,7 @@ class Web(ilv.conf.web.Web):
         self.urlDict = env.getUrlDict() # 获取网页地址栏参数
         self.postDict = env.getFormDicts() # 获取网页表单参数
         self.env = env # 获取网页请求环境变量
-        self.opfile = ilv.core.opfile.Opfile(dir_static=self.dir_static, plat=self.plat, mode=self.mode) # 初始化文件操作变量
+        
         self.init_paras()
         self.db = ilv.core.db.DB(self.dbType, self.dbHost, self.dbUsr, self.dbPsw, self.dbName) # 默认使用SQLite数据库
         
@@ -81,6 +81,11 @@ class Web(ilv.conf.web.Web):
         self.PARAS["sup_row"] = self.get_sup_row()
         self.PARAS["aim_row"] = self.get_aim_row()
         self.PARAS["user_row"] = self.get_user_row()
+        
+        # set opfile
+        mode = self.PARAS["sup_row"]["module"]
+        self.opfile = ilv.core.opfile.Opfile(dir_static=self.dir_static, plat=self.plat, mode=mode) # 初始化文件操作变量
+        
         pass
     ################################################################
     # 2 init_paras
@@ -320,7 +325,7 @@ class Web(ilv.conf.web.Web):
     ################################################################
     def goto(self,action=None):
         html = ""
-        html = self.get_templet("goto")
+        html = self.opfile.get_templet("goto")
         if action is None:
             action = self.get_action()
         html = html.replace("ilv_url",action)
@@ -404,6 +409,7 @@ class Web(ilv.conf.web.Web):
         html += self.getBody()        
         html += self.getTail()
         return html
+
     ####################################################################
     # IV help method
     ####################################################################
@@ -431,6 +437,7 @@ class Web(ilv.conf.web.Web):
     def get_control_htm(self):
         html = "ilv.plat.base.Base.get_control_htm<br>"
         return html
+
     ####################################################################
     # 2 get_menu_htm 获得网页菜单
     ####################################################################
@@ -455,21 +462,22 @@ class Web(ilv.conf.web.Web):
         paras["sup"] = 10
         paras["act"] = "view"
         action = self.get_action(paras)
-        titles = "网站首页"
-        urls = action
+        # 制作链接，去除脚本
+        menu_links = "&nbsp;"
+        menu_links += "<a href=%s target=_blank>网站首页</a>&nbsp;" % action
+        # 向上找一级
         if sup!="10":
             paras["sup"] = sup
             action = self.get_action(paras)
-            titles += "|%s" % sup_row["title"]
-            urls += "|"+action
+            title = sup_row["title"]
+            menu_links += "<a href=%s target=_blank>%s</a>&nbsp;" % (action,title)
         for subRow in subRows:
             paras["sup"] = subRow["kid"]
             action = self.get_action(paras)
-            titles += "|%s" % subRow["title"]
-            urls += "|"+action
+            title = subRow["title"]
+            menu_links += "<a href=%s target=_blank>%s</a>&nbsp;" % (action,title)
         html = self.opfile.get_templet("menu")
-        html = html.replace("ilv_titles",titles)
-        html = html.replace("ilv_urls",urls)
+        html = html.replace("ilv_menu_links",menu_links)
         # set the first news 头条新闻
         sql = ""
         sql += " select * from `%s`" % self.dtNews
@@ -492,7 +500,27 @@ class Web(ilv.conf.web.Web):
     # 3 getBody 网页主体
     ####################################################################
     def getBody(self):
-        html = "ilv.plat.base.Base.get_body_htm<br>"
+        html = ""
+        act = self.get_para("act")
+        user_row = self.get_user_row()
+        # 注意取消注释 不用if
+        if user_row:
+            user = str(user_row["kid"])
+        else:
+            user = "1"
+        pattern = self.get_para("p")
+        if user=="1" and pattern=="admin":
+            act = "add"
+            self.urlDict["act"] = act
+            self.urlDict["sup"] = self.ACTIVE_SUP
+        elif pattern=="admin":
+            pass
+        elif    act == self.PARAS["act"]:     
+            html += self.getTotal() # 获得总览层 闪动照片 最近更新
+            html += self.get_tab_htm() # get the tab
+            html += self.getSubfields() # 3、分栏层 分栏显示下属栏目更新
+            pass
+        html += self.get_act_htm()
         return html
         pass
 
@@ -591,7 +619,7 @@ class Web(ilv.conf.web.Web):
         aim = self.get_para("aim")
         dtname = self.get_module_row("dtname")["dtname"]
         # paras of form
-        html = self.get_templet(act)
+        html = self.opfile.get_templet(act)
         html = html.replace("ilv_action",self.get_action())
         column_node = self.get_sup_node()
         html = html.replace("ilv_columnNode",column_node)
@@ -737,14 +765,14 @@ class Web(ilv.conf.web.Web):
         if sup is None:
             sup = self.get_para("sup")
         # 1 load templet file
-        html = self.get_templet("search",sup)
+        html = self.opfile.get_templet("search")
         html = html.replace("ilv_action",self.get_action({"act":"search"}))
         # 2 get dtname
         dtname_row = self.get_module_row("dtname")        
         if dtname_row is not None:
             dtname = dtname_row["dtname"]
             if dtname in self.DT_TABLES:    
-                row_html = self.get_templet("search_row")         
+                row_html = self.opfile.get_templet("search_row")         
                 sql = ""
                 sql += " select * from `%s`" % dtname
                 if dtname==self.dtNews:
@@ -824,7 +852,7 @@ class Web(ilv.conf.web.Web):
                         tmp_html = tmp_html.replace("ilv_title",str(row["account"]))
                         html = html.replace("发布","登录")
                     else:
-                        tmp_html = tmp_html.replace("ilv_title",row["title"])
+                        tmp_html = tmp_html.replace("ilv_title",str(row["title"]))
                     tmp_html = tmp_html.replace("ilv_datetime",str(row["datetime"]))
                     admin_html = ""
                     user_row = self.get_user_row()
@@ -866,7 +894,7 @@ class Web(ilv.conf.web.Web):
             dtname = dtname_row["dtname"]
         else:
             dtname = "news"
-        html = self.get_templet("total")
+        html = self.opfile.get_templet("total")
         sql = ""
         sql += " select * from `%s`" % dtname
         sql += " where `item` like '%s%%'" % sup
@@ -900,7 +928,7 @@ class Web(ilv.conf.web.Web):
     def getRecent(self):
         html = ""
         sup = self.get_para("sup")
-        recentHtml = self.get_templet("recent")
+        recentHtml = self.opfile.get_templet("recent")
         self.db.run()
         sql = "select * from `news` order by `kid` desc limit 10"
         self.db.execute_query(sql)
@@ -920,12 +948,8 @@ class Web(ilv.conf.web.Web):
     ##################################################
     def get_tab_htm(self):
         html = ""
-        # set right
-        html_right = self.get_templet("tab_right")
-        action = self.get_action({"sup":1023,"act":"view"})
-        html_right = html_right.replace("ilv_zgw_action",action)
         sup = self.get_para("sup")
-        html = self.get_templet("tab")
+        html = self.opfile.get_templet("tab")
         self.db.run()
         sql = ""
         sql += " select * from `%s`" % self.dtColumn
@@ -972,7 +996,7 @@ class Web(ilv.conf.web.Web):
                 </a><br><!--/tab_content_row-->
                 """
             html = html.replace("ilv_tab_content",tab_content,1)
-        return (html_right+html)
+        return (html)
     ##################################################
     # 3、分栏层 subfields 分栏显示
     ##################################################

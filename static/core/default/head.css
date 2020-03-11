@@ -70,6 +70,7 @@ table{
     width:100%;height:3px;overflow:hidden;
     font-size:1px;
     border:0px dotted red;
+    background:#DED38C;
 }
 /*************************************************
 * 行、域设置
@@ -82,8 +83,9 @@ table{
 }
 
 #divTopMark{ /*顶部标识*/
-    width:100%;height:18px;overflow:hidden;
+    width:100%;overflow:hidden;
     font-size:12px;line-height:150%;
+    color:black;
 }
 /*顶部标签*/
 #div_topTag{

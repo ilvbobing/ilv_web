@@ -1,0 +1,42 @@
+@charset "utf-8";
+/**************************************************
+ * 菜单
+**************************************************/
+#divMenu{ /*菜单外框*/
+    width:100%;overflow:hidden;
+    border:0px solid blue;
+}
+#divMenuRow{ /*菜单一行*/
+    width:100%; /*军事工作 政治工作 保障工作*/
+    overflow:hidden;text-overflow:ellipsis; /*文字溢出不换行，用...表示*/
+    background:url(module/images/nav_bg.gif) repeat-x;
+    float:left;clear:left;
+    border:0px solid blue;
+}
+#div_news_first{
+    position:relative;left:0px;top:0px;
+    width:100%;overflow:hidden;
+    border:0px solid red;
+    font-size:14px;font-weight:bolder;
+    line-height:160%;
+    color:#DA57DB;
+}
+
+.menuItem{ /*菜单项盒*/
+    /*width:100px;height:20px;overflow:hidden; 定制宽度*/
+    display:inline-block; /*强制相邻结点在同一行*/
+    padding:0px 10px 1px 10px; /*内补丁：上右下左*/
+    text-align:center;
+    border:0px solid blue;
+    font-weight:bold;
+}
+*html .menuItem{ /*IE6菜单项盒*/
+    display:inline;
+}
+*+html .menuItem{ /*IE7菜单项盒*/
+    display:inline;
+}
+.menuItem:hover{ /*菜单项鼠标悬停*/
+    background:url(module/images/nav_hover.gif) no-repeat right center;
+}
+

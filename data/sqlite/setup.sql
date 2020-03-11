@@ -62,34 +62,24 @@ CREATE TABLE `item`(
 
 
 # 顶级栏目
-INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`)VALUES('10','0','2','首页','www','news'); # 内容集中到/www下
-update `item` set `module`='module/' where `kid`='10';
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('10','0','2','首页','www','news','default'); # 内容集中到/www下
+
 # 一级栏目(11~20)：应用 模块 会员 信箱 栏目
-INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`)VALUES('1011','10','2','新闻中心','base','news');
-INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`)VALUES('1012','10','2','模块','module','news');
-INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`)VALUES('1013','10','2','会员','user','user');
-INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`)VALUES('101301','1013','2','管理团队','user','user');
-INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`)VALUES('101302','1013','2','实名会员','user','user');
-INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`)VALUES('101303','1013','2','普通会员','user','user');
-INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`)VALUES('101304','1013','2','受限会员','user','user');
-update `item` set `module`='module/user/' where `kid` like '1013%';
-update `item` set `class`='User' where `kid` like '1013%';
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('1011','10','2','新闻中心','base','news','default');
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('1012','10','2','模块','module','news','default');
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('1013','10','2','会员','user','user','user');
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('101301','1013','2','管理团队','user','user','user');
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('101302','1013','2','实名会员','user','user','user');
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('101303','1013','2','普通会员','user','user','user');
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('101304','1013','2','受限会员','user','user','user');
 
-INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`)VALUES('1014','10','2','栏目','item');
-update `item` set `module`='module/item/' where `kid`='1014';
-update `item` set `dtname`='item' where `kid`='1014';
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('1014','10','2','栏目','item','item','item');
 
-INSERT INTO`item`
-(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)
-VALUES('1015','10','2','活动足迹','active','active','module/active/');
-
-# news
-#insert into `item`(`kid`,`item`,`title`,`name`,`dtname`,`module`)
-#values('101101','1011','新闻','news','news','module/news/');
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('1015','10','2','活动足迹','active','active','active');
 
 # 二级栏目(21~30)：微博
-INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('1021','10','微博','weibo');
-update `item` set `module`='weibo/' where `kid`='1021';
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('1021','10','2','微博','weibo','news','weibo');
+
 # 特色栏目(2101~2110)
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('102101','1021','大厅','news');
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('102102','1021','微刊','MicroMagazine');
@@ -101,13 +91,13 @@ INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('102104','1021','微吧','M
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('102105','1021','求助','MicroHelp');
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('102106','1021','百科','MicroBaiKe');
 
-INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('1022','10','大厅2','news');
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('1022','10','2','大厅2','news','news','weibo');
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('102201','1022','大厅2201','news');
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('102202','1022','大厅2202','news');
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('102203','1022','大厅2203','news');
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('102204','1022','大厅2204','news');
 
-INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('1023','10','大厅3','news');
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('1023','10','2','大厅3','news','news','weibo');
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('102301','1022','大厅2301','news');
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('102302','1022','大厅2302','news');
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('102303','1022','大厅2303','news');
@@ -184,14 +174,14 @@ INSERT INTO`user`(`kid`,`account`,`password`,`title`)VALUES('3','admin','admin',
 # 登录表：
 ########################################################################
 CREATE TABLE `active` (
-  `kid`            INT PRIMARY KEY     NOT NULL,
+  `kid`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   `sid`         INT      DEFAULT '0', # 1手动序号
   `name`        CHAR(255)         DEFAULT 'user', # 2类
   `account`     TEXT, # 3帐号
   `title`       TEXT, # 4昵称，标题
   `ip`          TEXT, # 5发表IP  
   `password`    TEXT, # 6密码
-  `item`      INT      DEFAULT '1013', # 7栏目
+  `item`        INT      DEFAULT '1013', # 7栏目
   `icon`        TEXT, # 8头像
   `video`       TEXT, # 9视频
   `image`       TEXT, # 10图片
@@ -217,6 +207,7 @@ CREATE TABLE `active` (
   `timedelta`   TIMESTAMP default '01:00'
 );
 
+INSERT INTO`active`(`kid`,`account`,`password`,`title`)VALUES('1','guest','guest','游客');
 
 ########################################################################
 # 新闻表：

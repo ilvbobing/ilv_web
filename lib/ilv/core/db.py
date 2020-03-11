@@ -221,9 +221,13 @@ class DB(ilv.conf.db.DB):
         self.cursor.execute(sql)
         col_name_list = self.get_col_names()
         col_value_list = self.cursor.fetchone()
+        if col_value_list is None:
+            print("ilv.core.db.DB.get_row:col_value_list is None,sql="+sql)
         i = 0
         while i < len(col_name_list):
-            row_dict[col_name_list[i]] = col_value_list[i]
+            col_name = col_name_list[i]
+            col_value = col_value_list[i]
+            row_dict[col_name] = col_value
             i+=1
         return row_dict
  

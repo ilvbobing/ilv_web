@@ -1,0 +1,51 @@
+<!--ilv_search-->
+<div class=hr>&nbsp;</div>
+<div id=div_act>
+<div class=hr>&nbsp;</div>
+<div id=div_act_box>
+    <script type=text/javascript>
+        <!--
+        function search(form){            
+            if(!form){
+                form = document.getElementById("form_search");
+            }
+            succeed = true;
+            svalue = document.getElementById("svalue");
+            if(svalue){
+                if(svalue.value==""){
+                    //succeed = false;
+                    //alert("关键字不能为空！");
+                }
+            }
+            //skey = document.getElementById("skey");
+            //alert(skey.value)
+            if(succeed){
+                form.submit();
+            }
+        }
+        //-->
+    </script>
+    <div class=tr>
+    <form id=form_search method=post action=ilv_action enctype=multipart/form-data>
+        搜索内容：<select id=skey name=skey>
+            <option value="title" selected>标题
+            <option value="summary">摘要
+            <option value="detail">内容
+        </select>
+        关键字：<input id=svalue name=svalue value="" />
+        <input type=button value="搜索" onClick=javascript:search(form_search); />
+        <input type=reset value="清空" />
+    </form>当前关键字：ilv_svalue
+    </div><!--/tr-->
+    <div class=tr_title>
+        <div class=td style=width:14%;text-align:center;>所属分类</div>
+        <div class=td style=width:35%;text-align:center;>标题</div>
+        <div class=td style=width:15%;text-align:center;>发布时间</div>
+        <div class=td style=width:35%;text-align:center;>操作</div>
+    </div><!--/tr_title-->
+<ilv_row />
+<ilv_page />
+</div><!--/div_act_box-->
+<div class=hr>&nbsp;</div>
+</div><!--/div_act-->
+<!--/ilv_search-->
