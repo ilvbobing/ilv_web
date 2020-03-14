@@ -132,14 +132,14 @@ INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('101121','1011','海外','n
 # 创建用户表：
 ########################################################################
 CREATE TABLE `user` (
-  `kid`            INT PRIMARY KEY     NOT NULL,
+  `kid`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   `sid`         INT      DEFAULT '0', # 1手动序号
   `name`        CHAR(255)         DEFAULT 'user', # 2类
   `account`     TEXT, # 3帐号
   `title`       TEXT, # 4昵称，标题
   `ip`          TEXT, # 5发表IP  
   `password`    TEXT, # 6密码
-  `item`      INT      DEFAULT '1013', # 7栏目
+  `item`        INT      DEFAULT '1013', # 7栏目
   `icon`        TEXT, # 8头像
   `video`       TEXT, # 9视频
   `image`       TEXT, # 10图片
@@ -213,7 +213,7 @@ INSERT INTO`active`(`kid`,`account`,`password`,`title`)VALUES('1','guest','guest
 # 新闻表：
 ########################################################################
 CREATE TABLE `news` (
-   `kid`        INT PRIMARY KEY     NOT NULL,
+   `kid`        INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
    `sid`        INT                 DEFAULT 0,
    `name`       CHAR(255)           DEFAULT 'news',
   `account`     TEXT, # 3帐号

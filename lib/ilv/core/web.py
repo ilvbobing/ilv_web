@@ -953,14 +953,16 @@ class Web(ilv.conf.web.Web):
         self.db.run()
         sql = ""
         sql += " select * from `%s`" % self.dtColumn
-        sql += " where `level`='1'"
+        sql += " where `level`>='1'"
         sql += " and ("
         sql += " `kid`='1022' or `kid`='1023' or `kid`='1024'"
         sql += " or `%s` like '1025%%')" % self.dtColumn
         sql += " order by `kid` asc"
         sql += " limit 10"
+        print("ilv.core.web.Web.get_tab_htm:sql="+sql+"\r\n<br>")
         self.db.execute_query(sql)
         rows = self.db.get_row_dicts()
+        print("ilv.core.web.Web.get_tab_htm:rows="+str(rows)+"\r\n<br>")
         self.db.close()
         rowIdx = 0
         paras = {}
