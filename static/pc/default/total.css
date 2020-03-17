@@ -1,0 +1,56 @@
+@charset "utf-8";
+/**************************************************
+ * 2、总览层 total 显示闪耀图片和最近更新记录
+**************************************************/
+#divTotal{
+    width:100%;overflow:hidden;
+    background:#FFF;
+    /*border:1px solid red;*/
+}
+#divShine{
+    float:left;clear:left;
+    width:50%;height:300px;overflow:hidden;
+    overflow:hidden;text-overflow:ellipsis; /*文字溢出不换行，用...表示*/
+    display:inline; /*强制左右结点在同一行*/
+    border:1px solid #BED4EC;
+    text-align:center;
+    padding-top:1px;
+}
+#divRecent{
+    float:right;clear:right;
+    width:49%;height:300px;overflow:hidden;
+    overflow:hidden;text-overflow:ellipsis; /*文字溢出不换行，用...表示*/    
+    display:inline; /*强制左右结点在同一行*/
+    border:1px solid #BED4EC;    
+    text-align:center;
+}
+#divRecentTitle{
+    height:24px;overflow:hidden;
+    background:url(images/bgRecentTitle.jpg);
+    text-align:left;
+    padding-left:20px;
+    padding-top:3px;
+    color:#283A79;
+    font-weight:bold;
+}
+.recentRow{
+    width:98%;overflow:hidden;
+    overflow:hidden;text-overflow:ellipsis; /*文字溢出不换行，用...表示*/
+    border:1px solid #DED1D1;
+    border-style:dotted dotted dotted dotted;/*边框类型上 右 下 左*/
+    border-width:0px 0px 1px 0px;
+    text-align:left;
+}
+.recentRecord{
+    width:84%;overflow:hidden;
+    text-overflow:ellipsis;/*文字溢出不换行，用...表示*/
+    white-space:nowrap; /*中间不换行*/
+    display:inline; /*强制左右结点在同一行*/
+    text-align:left;
+}
+.recentDatetime{
+    width:16%;overflow:hidden;
+    text-overflow:hidden;/*ellipsis;/*文字溢出不换行，用...表示*/
+    white-space:nowrap; /*中间不换行*/
+    display:inline; /*强制左右结点在同一行*/
+}

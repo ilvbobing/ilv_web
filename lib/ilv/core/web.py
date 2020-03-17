@@ -49,7 +49,47 @@ class Web(ilv.conf.web.Web):
         self.urlDict = env.getUrlDict() # 获取网页地址栏参数
         self.postDict = env.getFormDicts() # 获取网页表单参数
         self.env = env # 获取网页请求环境变量
+ 
+        # 2 根据用户指定模式确定前台模式
+        # =============================
+        urlDict = self.urlDict
+        agent = self.env.get_agent()
+        if "plat" in urlDict:
+            # 2.1 电脑端模式
+            # --------------
+            if urlDict["plat"]=="pc":
+                self.plat = "pc"
+            # 2.2 平板模式
+            # ------------
+            elif urlDict["plat"]=="pad":
+                self.plat = "pad"
+            # 2.3 手机模式
+            # ------------
+            elif urlDict["plat"]=="cell":
+                self.plat = "cell"
+            # 2.4 默认的文本模式
+            else:
+               self.plat = "core"
+            
+        # 3 根据客户端实际情况确定前台模式
+        else:
+            # 3.1 如果有Windows或Linux，则为电脑端
+            # -----------------------------------
+            if "Windows" in agent or "Linux" in agent:
+                self.plat = "pc"
+            # 3.2 如果有Mobile，则为手机端
+            elif "Mobile" in agent:
+                self.plat = "cell"
+            # 3.3 如果有Android，且没有Mobile，则为平板
+            # ----------------------------------------
+            elif "Android" in agent:
+                self.plat = "pad"
+            # 3.4 其他情况显示默认的文本模式
+            # -----------------------------
+            else:
+                self.plat = "core"
         
+        # 4 初始化参数集
         self.init_paras()
         self.db = ilv.core.db.DB(self.dbType, self.dbHost, self.dbUsr, self.dbPsw, self.dbName) # 默认使用SQLite数据库
         

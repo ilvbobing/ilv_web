@@ -8,10 +8,7 @@
 3.The other class (for exampe Microblog) is the child of MyBase
 """
 # python library
-import os,datetime,struct,stat
-import ilv.Time
-import ilv.db.pot
-import ilv.plat.base
+import ilv.core.web
 
 ########################################################################
 # Cell 手机端网页 是页面拓展基础类的子类
@@ -22,7 +19,7 @@ import ilv.plat.base
 # 三、分栏层：subfield 分栏显示
 # 四、列表层：list 列表显示
 ########################################################################
-class Cell(ilv.plat.base.Base):
+class Web(ilv.core.web.Web):
     #===================================================================
     # 1 基本属性 base profile
     #===================================================================
@@ -39,21 +36,17 @@ class Cell(ilv.plat.base.Base):
         """
         # 父类方法：super(子类，self).__init__(参数1，参数2，....)
         # 经典写法：父类名称.__init__(self,参数1，参数2，...)
-        ilv.plat.base.Base.__init__(self,env=env)
+        ilv.core.web.Web.__init__(self,env=env)
         
         # init paras
         pass
 
-    #===================================================================
-    # 3 主要方法 major method
-    #===================================================================
-
-    #===================================================================
-    # 4 辅助方法 help method
-    #===================================================================
-
-    # 4.1 获得网页头 getHead get html head
-    #=====================================
+    ####################################################################
+    # IV help method 辅助方法
+    ####################################################################
+    ####################################################################
+    # 1 getHead get html head
+    ####################################################################
     def get_head_htm(self):
         html = None
         # 1 set sup user
@@ -61,37 +54,21 @@ class Cell(ilv.plat.base.Base):
         user_row = self.get_para("user_row")
         # 2 set title 需要拓展
         title = sup_row["title"] + "--" + self.title + " " + self.revision
-        # 3 set style
-        css_head = self.get_path(pre_dir="css", style="default", file_name="head.css")
-        css_act = self.get_path(pre_dir="css", style="default", file_name="act.css")
-        css = self.get_path(pre_dir="css", style="default", file_name="style.css")
         # 4 read templet
-        html = self.get_templet("head")
+        html = self.opfile.get_templet("head")
         html = html.replace("ilv_title",title)
-        html = html.replace("ilv_style_head",css_head)
-        html = html.replace("ilv_style_act",css_act)
-        html = html.replace("ilv_style_style",css)
         html = html.replace("ilv_user",user_row["account"])
         # 5 set control
         html = html.replace("ilv_control",self.get_control_htm())
         return html 
-
+      
     ####################################################################
     # 1.1 get_control_htm
     ####################################################################
     def get_control_htm(self):
-        html = ""
-        sup_row = self.get_para("sup_row")
-        html = self.get_templet("control")
-        html = html.replace("ilv_title",sup_row["title"])
-        paras = {}
-        paras["act"] = "add"
-        action_add = self.get_action(paras)
-        html = html.replace("ilv_action_add",action_add)
-        paras["act"] = "view"
-        action_view = self.get_action(paras)
-        html = html.replace("ilv_action_view",action_view)
+        html = "ilv.plat.base.Base.get_control_htm<br>"
         return html
+
     ####################################################################
     # 2 get_menu_htm 获得网页菜单
     ####################################################################
@@ -116,21 +93,22 @@ class Cell(ilv.plat.base.Base):
         paras["sup"] = 10
         paras["act"] = "view"
         action = self.get_action(paras)
-        titles = "网站首页"
-        urls = action
+        # 制作链接，去除脚本
+        menu_links = "&nbsp;"
+        menu_links += "<a href=%s target=_blank>网站首页</a>&nbsp;" % action
+        # 向上找一级
         if sup!="10":
             paras["sup"] = sup
             action = self.get_action(paras)
-            titles += "|%s" % sup_row["title"]
-            urls += "|"+action
+            title = sup_row["title"]
+            menu_links += "<a href=%s target=_blank>%s</a>&nbsp;" % (action,title)
         for subRow in subRows:
             paras["sup"] = subRow["kid"]
             action = self.get_action(paras)
-            titles += "|%s" % subRow["title"]
-            urls += "|"+action
-        html = self.get_templet("menu")
-        html = html.replace("ilv_titles",titles)
-        html = html.replace("ilv_urls",urls)
+            title = subRow["title"]
+            menu_links += "<a href=%s target=_blank>%s</a>&nbsp;" % (action,title)
+        html = self.opfile.get_templet("menu")
+        html = html.replace("ilv_menu_links",menu_links)
         # set the first news 头条新闻
         sql = ""
         sql += " select * from `%s`" % self.dtNews
@@ -148,9 +126,10 @@ class Cell(ilv.plat.base.Base):
             html = html.replace("ilv_first_title",row["title"])
         return html
         pass
-    ################################################################
+        
+    ####################################################################
     # 3 getBody 网页主体
-    ################################################################
+    ####################################################################
     def getBody(self):
         html = ""
         act = self.get_para("act")
@@ -174,6 +153,8 @@ class Cell(ilv.plat.base.Base):
             pass
         html += self.get_act_htm()
         return html
+        pass
+
     ##################################################
     # getAct 1.2 操作内容
     ##################################################
@@ -269,7 +250,7 @@ class Cell(ilv.plat.base.Base):
         aim = self.get_para("aim")
         dtname = self.get_module_row("dtname")["dtname"]
         # paras of form
-        html = self.get_templet(act)
+        html = self.opfile.get_templet(act)
         html = html.replace("ilv_action",self.get_action())
         column_node = self.get_sup_node()
         html = html.replace("ilv_columnNode",column_node)
@@ -407,192 +388,6 @@ class Cell(ilv.plat.base.Base):
         html = html.replace("ilv_msg",msg)
         return html
         pass
-    ####################################################################
-    # 3.1.5 edit 编辑会员
-    ####################################################################
-    def edit1(self):
-        # 1 paras of url
-        paras = {}
-        paras["act"] = self.PARAS["act"]
-        sup = self.get_para("sup")
-        dtname = self.get_module_row("dtname")["dtname"]
-        act = self.get_para("act")
-        # paras of form
-        html = self.get_templet(act)
-        html = html.replace("ilv_action",self.get_action())
-        column_node = self.get_sup_node()
-        msg = ""
-        aim = "" # 0
-        sid = "" # 1
-        title = "" # 2
-        account = ""
-        ip = self.env.getClient()
-        password = ""
-        name = ""
-        summary = ""        
-        detail = ""
-        aim_dtname = ""
-        t = ilv.Time.Time()
-        datetime = t.getDatetime()
-        millisecond = t.getMillisecond()
-        aimRow =    self.get_aim_row()
-        if act=="edit" or act=="show":
-            if aimRow is not None:
-                aim = str(aimRow["kid"])
-                sid = str(aimRow["sid"])
-                title = aimRow["title"]
-                account = aimRow["account"]
-                name = aimRow["name"]
-                ip = aimRow["ip"]
-                summary = aimRow["summary"]
-                detail = aimRow["detail"]
-                aim_dtname = str(aimRow["dtname"])
-                aim_column = str(aimRow["column"])
-                password = aimRow["password"]
-                # set column node
-                column_node = column_node.replace("selected>",">")
-                split = "value="+aim_column+" "
-                column_node = column_node.replace(split,split+"selected")
-        if act=="show" and aimRow is not None:
-            if str(aimRow["image"])!="None" and aimRow["image"]!="":
-                html = html.replace("ilv_image",aimRow["image"])
-                html = html.replace("image style=display:none;","image")
-            if str(aimRow["video"])!="None" and aimRow["video"]!="":
-                html = html.replace("ilv_video",aimRow["video"])
-                html = html.replace("video style=display:none;","video")
-        html = html.replace("ilv_columnNode",column_node)
-        html = html.replace("ilv_kid",aim)
-        html = html.replace("ilv_sid",sid)
-        if ip is None:
-            ip = self.env.getClient()
-        html = html.replace("ilv_ip",ip)
-        html = html.replace("ilv_sup",str(sup))
-        html = html.replace("ilv_act",act)
-        html = html.replace("ilv_aim",str(aim))
-        html = html.replace("ilv_account",str(account))
-        html = html.replace("ilv_password",str(password))
-        html = html.replace("ilv_title",title)
-        html = html.replace("ilv_dtname",aim_dtname)
-        if name is None:
-            name = ""
-        html = html.replace("ilv_name",name)
-        if summary is None:
-            summary = ""
-        html = html.replace("ilv_summary",summary)
-        if detail is None:
-            detail = ""
-        html = html.replace("ilv_detail",detail)
-        html = html.replace("ilv_datetime",datetime)
-        html = html.replace("ilv_millisecond",millisecond)
-        # check the form
-        succeed = False
-        msg = ""
-        if self.postDict is not None and len(self.postDict)>0:
-            succeed = True
-        # recover the image and video
-        if succeed and act=="edit":
-            # if there is no image upload,donont chanage
-            if "image" in self.postDict and self.postDict["image"][0]["value"]=="":
-                self.postDict["image"][0]["value"] = aimRow["image"]
-            if "video" in self.postDict and self.postDict["video"][0]["value"]=="":
-                self.postDict["video"][0]["value"] = aimRow["video"]
-        # check the account and password of user when login
-        if succeed and sup=="1015" and act=="add":
-            account = self.postDict["account"][0]["value"]
-            password = self.postDict["password"][0]["value"]
-            self.db.run()
-            user_row = self.db.get_row(self.dtUser,account,"account")
-            self.db.close()
-            if user_row is None:
-                msg += "帐号%s不存在。" % account
-                self.add_msg(msg)
-                succeed = False
-            # check the password when account is succeed
-            if succeed:
-                sql = ""
-                sql += " select * from `%s`" % self.dtUser
-                sql += " where `account`='%s'" % account
-                sql += " and `password`='%s'" % password
-                sql += " limit 1"
-                self.db.run()
-                self.db.execute_query(sql)
-                users = self.db.get_row_dicts()
-                if len(users)<1:
-                    msg += "帐号%s与密码不匹配" % account
-                    self.add_msg(msg)
-                    succeed = False
-                else:
-                    paras["u"] = user_row["kid"]
-            self.db.close()
-        # 2 读取表单数据
-        if succeed:
-            html += "<br>"+str(self.postDict)+"<br>"
-        if succeed:
-            keys = self.postDict.keys()
-            values = self.postDict.values()
-            sql = None
-            # 2.1 add record
-            if act=="add":
-                # 2.1.1 check column kid
-                if "kid" in self.postDict:
-                    kid = self.postDict["kid"][0]["value"]
-                    canUse = False
-                    kid = int(self.postDict[self.dtColumn][0]["value"])*100 + int(kid) - 1
-                    while not canUse:
-                        kid += 1
-                        self.db.run()
-                        row = self.db.get_row(dtname,str(kid))
-                        self.db.close()
-                        if row is None:
-                            canUse = True
-                    self.postDict["kid"][0]["value"] = str(kid)
-                # 2.1.2 construct sql                
-                sql = ""
-                sql += " insert into `%s`" % dtname
-                sql += " ("
-                idx = 0
-                for key in keys:
-                    idx += 1
-                    if idx == 1:
-                        sql += "`%s`" % key
-                    else:
-                        sql += ",`%s`" % key
-                sql += " )"
-                sql += "values("
-                idx = 0
-                for value in values:
-                    idx += 1
-                    if idx == 1:
-                        sql += "'%s'" % value[0]["value"]
-                    else:
-                        sql += ",'%s'" % value[0]["value"]
-                sql += " )"             
-            # 2.2 edit record
-            elif act=="edit":
-                sql = ""
-                sql += " update `%s`" % dtname
-                idx = 0
-                for key in self.postDict:
-                    idx += 1
-                    if idx==1:
-                        sql += " set `%s`='%s'" % (key,self.postDict[key][0]["value"]) 
-                    else:
-                        sql += ",`%s`='%s'" % (key,self.postDict[key][0]["value"])
-                sql += " where `kid`='%s'" % aimRow["kid"]
-                sql += " limit 1"
-            # 2.4 write data
-            if sql is not None:
-                html += sql + "<br>"
-                self.db.run()
-                self.db.execute(sql)
-                self.db.close()
-        # 3 goto the new html
-        if succeed:
-            return self.goto(action=self.get_action(paras=paras))
-        # 4 show act html
-        html = html.replace("ilv_msg",msg)
-        return html
-        pass
     ####################################################################################
     # 3.1.6 search 查找会员
     ####################################################################################
@@ -601,14 +396,14 @@ class Cell(ilv.plat.base.Base):
         if sup is None:
             sup = self.get_para("sup")
         # 1 load templet file
-        html = self.get_templet("search")
+        html = self.opfile.get_templet("search")
         html = html.replace("ilv_action",self.get_action({"act":"search"}))
         # 2 get dtname
         dtname_row = self.get_module_row("dtname")        
         if dtname_row is not None:
             dtname = dtname_row["dtname"]
             if dtname in self.DT_TABLES:    
-                row_html = self.get_templet("search_row")         
+                row_html = self.opfile.get_templet("search_row")         
                 sql = ""
                 sql += " select * from `%s`" % dtname
                 if dtname==self.dtNews:
@@ -688,7 +483,7 @@ class Cell(ilv.plat.base.Base):
                         tmp_html = tmp_html.replace("ilv_title",str(row["account"]))
                         html = html.replace("发布","登录")
                     else:
-                        tmp_html = tmp_html.replace("ilv_title",row["title"])
+                        tmp_html = tmp_html.replace("ilv_title",str(row["title"]))
                     tmp_html = tmp_html.replace("ilv_datetime",str(row["datetime"]))
                     admin_html = ""
                     user_row = self.get_user_row()
@@ -730,7 +525,7 @@ class Cell(ilv.plat.base.Base):
             dtname = dtname_row["dtname"]
         else:
             dtname = "news"
-        html = self.get_templet("total")
+        html = self.opfile.get_templet("total")
         sql = ""
         sql += " select * from `%s`" % dtname
         sql += " where `item` like '%s%%'" % sup
@@ -764,7 +559,7 @@ class Cell(ilv.plat.base.Base):
     def getRecent(self):
         html = ""
         sup = self.get_para("sup")
-        recentHtml = self.get_templet("recent")
+        recentHtml = self.opfile.get_templet("recent")
         self.db.run()
         sql = "select * from `news` order by `kid` desc limit 10"
         self.db.execute_query(sql)
@@ -784,23 +579,21 @@ class Cell(ilv.plat.base.Base):
     ##################################################
     def get_tab_htm(self):
         html = ""
-        # set right
-        html_right = self.get_templet("tab_right")
-        action = self.get_action({"sup":1023,"act":"view"})
-        html_right = html_right.replace("ilv_zgw_action",action)
         sup = self.get_para("sup")
-        html = self.get_templet("tab")
+        html = self.opfile.get_templet("tab")
         self.db.run()
         sql = ""
         sql += " select * from `%s`" % self.dtColumn
-        sql += " where `level`='1'"
+        sql += " where `level`>='1'"
         sql += " and ("
         sql += " `kid`='1022' or `kid`='1023' or `kid`='1024'"
         sql += " or `%s` like '1025%%')" % self.dtColumn
         sql += " order by `kid` asc"
         sql += " limit 10"
+        # print("ilv.core.web.Web.get_tab_htm:sql="+sql+"\r\n<br>")
         self.db.execute_query(sql)
         rows = self.db.get_row_dicts()
+        # print("ilv.core.web.Web.get_tab_htm:rows="+str(rows)+"\r\n<br>")
         self.db.close()
         rowIdx = 0
         paras = {}
@@ -836,7 +629,7 @@ class Cell(ilv.plat.base.Base):
                 </a><br><!--/tab_content_row-->
                 """
             html = html.replace("ilv_tab_content",tab_content,1)
-        return (html_right+html)
+        return (html)
     ##################################################
     # 3、分栏层 subfields 分栏显示
     ##################################################
@@ -929,6 +722,8 @@ class Cell(ilv.plat.base.Base):
         </html>
         """ % self.msg
         return htmlTail        
+
+
 
 
 

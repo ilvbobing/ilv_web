@@ -1,0 +1,27 @@
+<!--ilv_add-->
+<div id=div_act>
+<script type=text/javascript src=module/js/FormAct.js></script><!--表单检测插件-->
+<form id=form_act method=post style=width:500px; action=ilv_action enctype=multipart/form-data>
+    <div id=div_msg>ilv_msg</div>
+    <div id=div_account>
+        会员帐号:
+        <input type=text id=input_account name=account value='' />
+    </div>
+    <div id=div_password>
+        会员密码:
+        <input type=password id=input_password name=password value='' />
+    </div>
+    <div id=divLoginEnd>
+        持续时间:
+        <input type=text id=input_timedelta name=timedelta value='0000-00-00 03:00:00' />
+        (默认有效时间为3小时)
+    </div>
+    <input type=hidden type=hidden name=datetime value='ilv_datetime' />
+    <input type=hidden type=hidden name=ip value='ilv_ip' />
+    <br>
+    <input type=button onclick=FormAct.submit(form_act); value=登录 />&nbsp;&nbsp;
+    <input type=button onclick=history.back(); value=取消 />&nbsp;&nbsp;
+    <input type=reset value=清空 />
+</form>
+</div>
+<!--/ilv_add-->

@@ -22,6 +22,7 @@ class DB:
     
     # 1 数据库基本参数
     #================
+    dbType = None # 数据库类型
     dbHost = None # 也可以为：127.0.0.1
     dbUsr = None # 数据库登录用户
     dbPsw = None # 数据库登录密码

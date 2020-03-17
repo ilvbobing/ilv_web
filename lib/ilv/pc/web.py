@@ -8,11 +8,7 @@
 3.The other class (for exampe Microblog) is the child of MyBase
 """
 # python library
-import os,datetime,struct,stat
-import ilv.Env
-import ilv.Config
-import ilv.Time
-import ilv.db.DB_Factory
+import ilv.core.web
 
 ########################################################################
 # Base 基础网页 是页面拓展的基础类
@@ -23,21 +19,8 @@ import ilv.db.DB_Factory
 # 三、分栏层：subfield 分栏显示
 # 四、列表层：list 列表显示
 ########################################################################
-class Base(ilv.Config.Config):
-    ######################################################################
-    # 一 基本属性
-    ######################################################################
-    urlDict = {} # 地址栏参数字典
-    postDict = {} # 表单参数字典
-    msg = "" # process message,usually is error
-    PARAS = {} # 基本参数集，用于存放常用参数
+class Web(ilv.core.web.Web):
 
-    #######################################################################
-    # II pre method
-    # 1 construct method
-    # 2 get_url find the url from sup until finded
-    # 3 getTemplet get the html of templet
-    ######################################################################
     ################################################################
     # 1 constructor 构造函数
     ################################################################
@@ -45,426 +28,13 @@ class Base(ilv.Config.Config):
         """__init__ construct the class
         
         """
+        # 父类方法：super(子类，self).__init__(参数1，参数2，....)
+        # 经典写法：父类名称.__init__(self,参数1，参数2，...)
+        ilv.core.web.Web.__init__(self,env=env)
+                
         # init paras
-        self.urlDict = env.getUrlDict() # 获取网页地址栏参数
-        self.postDict = env.getFormDicts() # 获取网页表单参数
-        self.env = env # 获取网页请求环境变量
-        self.init_paras()
-        self.db = ilv.db.DB_Factory.get_db(self.dbType, self.dbHost, self.dbUsr, self.dbPsw, self.dbName) # 默认使用SQLite数据库
-        
-        # init log file
-        log_dir = self.LOG_DIR # 从Config继承：module/templet/
-        log_msg = self.LOG_MSG # 从Config继承：module/templet/msg.html
-        log_uwsgi = self.LOG_UWSGI # 从Config继承：module/templet/uwsgi.html
-        # 此项未执行
-        if False and len(self.urlDict)==0:
-            if os.path.exists(log_msg): # 删除已存在的msg.html
-                os.remove(log_msg) # deletelog
-            self.add_msg("<!--ilv_msg-->")
-            self.add_msg("MSG:")
-            self.add_msg("MSG:")
-            if os.path.exists(log_uwsgi):
-                os.remove(log_uwsgi)
-            self.add_msg("<!--ilv_uwsgi-->",log_uwsgi)
-            self.add_msg("UWSGI:",log_uwsgi)
-            self.add_msg("UWSGI:",log_uwsgi)
-        else:
-            mode = stat.S_IRWXO|stat.S_IRWXG|stat.S_IRWXU
-            if os.path.exists(log_dir):
-                os.chmod(log_dir,mode)
-            if os.path.exists(log_msg):
-                os.chmod(log_msg,mode)
-            if os.path.exists(log_uwsgi):
-                os.chmod(log_uwsgi,mode)
-        # useful row
-        self.PARAS["sup_row"] = self.get_sup_row()
-        self.PARAS["aim_row"] = self.get_aim_row()
-        self.PARAS["user_row"] = self.get_user_row()
         pass
-    ################################################################
-    # 2 init_paras
-    ################################################################
-    def init_paras(self):
-        t = ilv.Time.Time()
-        paras = self.PARAS
-        # useful paras
-        paras["act"] = "view" # 浏览模式
-        paras["aim"] = "1" # the default aim of news
-        paras["aim_row"] = None
-        paras["datetime"] = t.getDatetime()
-        paras["hire"] = "1"
-        paras["ip"] = self.env.getClient()
-        paras["millisecond"] = t.getMillisecond()
-        paras["page"] = "1"
-        paras["p"] = "simple" # mode:simple admin
-        paras["sup"] = "10"
-        paras["sup_row"] = None
-        paras["u"] = "1" # user of client
-        paras["user_row"] = None
-    ################################################################
-    # 3 get_para
-    ################################################################
-    def get_para(self,name=None,row=None):
-        para = None
-        if row is None:
-            row = {}
-        if name is None:
-            return None
-        if name in row and row[name]:
-            para = row[name]
-        elif name in self.urlDict and self.urlDict[name]:
-            para = self.urlDict[name]
-        elif name in self.PARAS and self.PARAS[name]:
-            para = self.PARAS[name]
-        else:
-            if row is not None:
-                para = ""
-            else:
-                self.add_msg("Base.get_para:para=None,name=%s" % str(name))
-        return para
-    ############################################################################################
-    # 4 getActon get the website url of http
-    ############################################################################################
-    def get_action(self,paras=None):
-        action = "http://"
-        action += self.env.getHost()
-        action += self.action
-        action += "?"
-        if paras is None:
-            paras = {}
-        # simple act aim hire pattern page sup user
-        names = ["act","aim","hire","p","page","sup","u"]
-        for name in names:
-            if name in paras:
-                action += "&%s=%s" % (name,str(paras[name]))
-            else:
-                para = self.get_para(name)
-                if para is not None and str(para)!="":
-                    action += "&%s=%s" % (name,para)
-        return action
-        pass
-    ################################################################
-    # 5 get_module_row
-    ################################################################
-    def get_module_row(self,name=None,sup=None):
-        row = None
-        if sup is None:
-            sup = self.get_para(name="sup")
-        if name is None:
-            name = "module"
-        idx = 0
-        while idx<=10: # recycle only 10 times
-            idx += 1
-            self.db.run()
-            sup_row = self.db.get_row(dtname=self.dtColumn, kid=sup)
-            self.db.close()
 
-            if sup_row is None:
-                sup = self.PARAS["sup"]
-                continue
-            if name in sup_row:
-                # name is a column of the datatable
-                module = sup_row[name]
-                if module is not None:
-                    row = sup_row
-                    break
-                else:
-                    sup = sup_row[self.dtColumn]
-            else:
-                self.add_msg("Base.get_module_row(:%s is not in %s" \
-                             % (name,sup_row))
-                break
-        if idx==11:
-            self.add_msg("Base.get_module_row:idx=11,name=%s,sup=%s"\
-                         % (str(name),str(sup)))
-        return row
-    ################################################################
-    # 6 get_row example:102222 1014 sup
-    ################################################################
-    def get_row(self,aim=None,sup=None,name=None):
-        row = None
-        dtname = None
-        kid = aim
-        dtname_row = self.get_module_row(name="dtname",sup=sup)
-        if dtname_row is not None:
-            dtname = dtname_row["dtname"] # column
-            # 1 default row
-            self.db.run()
-            row = self.db.get_row(dtname,self.PARAS[name])
-            self.db.close()
-            if kid is None:
-                kid = self.get_para(name)
-            if kid==self.PARAS[name]:
-                # kid is the default
-                pass
-            else:
-                # self.urlDic[name]!=self.PARAS[name]
-                self.db.run()
-                aim_row = self.db.get_row(dtname,kid) # None
-                self.db.close()
-                if aim_row is not None:
-                    row = aim_row
-                else:
-                    self.add_msg("Base.get_row(aim=%s,sup=%s,name=%s):\
-                        aim_row is None." % (str(aim),str(sup),str(name)))
-        else:
-            self.add_msg("Base.get_row(aim=%s,sup=%s,name=%s):\
-                dtname_row is None" % (str(aim),str(sup),str(name)))
-        # change the right aim in url
-        if aim is None and row is not None and name is not None:
-            self.urlDict[name] = str(row["kid"])
-        return row
-    def get_sup_row(self,sup=None):
-        return self.get_row(aim=sup,sup=self.COLUMN_SUP,name="sup")
-    def get_aim_row(self,aim=None,sup=None):
-        return self.get_row(aim=aim,sup=sup,name="aim")
-    ############################################################################################
-    # 7 get_url get url from sup and sup
-    ############################################################################################
-    def get_path(self,suffix=None,sup=None):
-        path = None
-        url = None
-        if suffix is None:
-            suffix="templet/head.html"
-        if sup is None:
-            sup = self.get_para("sup")
-        pattern = self.get_para("p")
-        if pattern=="admin":
-            # 1 admin mode
-            url = "module/admin/"+suffix
-            if os.path.exists(url):
-                path = url
-        if path is None:
-            # 2 simple mode
-            isExists = False
-            idx = 0
-            while idx<=10: # recycle only 10 times
-                module_row = self.get_module_row("module",sup)
-                if module_row is not None:
-                    module = module_row["module"]
-                    url = module+suffix
-                    if suffix=="templet/edit.html":
-                        self.add_msg("Base.get_path:sup=%s,url=%s" % (str(sup),str(url)))
-                    if os.path.exists(url):
-                        # url is exists
-                        path = url
-                        break
-                    else:
-                        sup = module_row[self.dtColumn]
-                else:
-                    self.add_msg("Base.get_path(suffix=%s,sup=%s):\
-                        module is None." % (str(suffix),str(sup)))
-                    break                    
-            if idx==11:
-                self.add_msg("Base.get_path:idx=10,suffix=%s,sup=%s"\
-                             % (str(suffix),str(sup)))            
-        return path
-    ################################################################
-    # 8 get_templet
-    ################################################################
-    def get_templet(self,name=None,sup=None):
-        html = None
-        if name is None:
-            name = self.PARAS["act"]
-        path = self.get_path("templet/"+name+".html",sup)
-        if path is not None:
-            output = open(path,mode='r',buffering=1)
-            data = output.readline()
-            while data and data.find("<!--ilv_%s-->" % name) == -1:
-                data = output.readline()
-            if data:
-                html = data
-            while data and data.find("<!--/ilv_%s-->" % name) == -1:
-                data = output.readline()
-                html += data
-            output.close()             
-        else:
-            self.add_msg("Base.get_templet:path=None,name=%s,sup=%s"\
-                         % (str(name),str(sup)))
-        return html
-    ################################################################
-    # 9 add_msg
-    ################################################################
-    def add_msg(self,msg=None,path=None):
-        # 1 open the log file
-        log_dir = self.LOG_DIR
-        if path is None:
-            log_msg = self.LOG_MSG
-        else:
-            log_msg = path
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
-        if not os.path.exists(log_msg):
-            output = open(log_msg,mode="w")
-        else:
-            output = open(log_msg,mode="a")
-        if msg:
-            output.write(str(msg)+self.bn)
-        output.close()
-        return str(msg)
-        
-    ################################################################
-    # 10 get_user_row
-    ################################################################
-    def get_user_row1(self,user=None):    
-        row = None
-        u = user
-        if u is None:
-            u = self.get_para("u")
-        self.db.run()
-        row = self.db.get_row(dtname=self.dtUser,kid=u)
-        # 如果没有取出，则显示出错信息。
-        if row is None:
-            self.add_msg("Base.get_user_row(user=%s):row=%s" % (str(u),str(row)))
-        self.db.close()
-        return row
-    ################################################################
-    # 10 get_user_row
-    ################################################################
-    def get_user_row(self,user=None):
-        row = None
-        u = user
-        #self.add_msg("Base.get_user_row:user=%s" % str(user))
-        if u is None:
-            u = self.get_para("u")
-        # 1 set default row
-        # 三个参数：1, 1013,u
-        row = self.get_row(self.PARAS["u"],self.USER_SUP,"u")    
-        user_row = self.get_row(u,self.USER_SUP,"u")
-        if user_row is not None:
-            u = str(user_row["kid"])
-            if str(u)==str(self.PARAS["u"]):
-                # user is default
-                pass
-            elif "account" in user_row:
-                # check if user is loginned
-                account = user_row["account"]
-                ip = self.env.getClient()
-                sql = ""
-                sql += " select * from `%s`" % self.dtActive
-                sql += " where `account`='%s'" % account
-                sql += " and `ip`='%s'" % ip
-                sql += " order by `datetime` desc"
-                sql += " limit 1"
-                self.db.run()
-                self.db.execute_query(sql)
-                rows = self.db.get_row_dicts()
-                self.db.close() 
-                if len(rows)>0:
-                    # user have loginned some time ago
-                    row = rows[0]
-                    t = ilv.Time.Time()
-                    start = t.datetime(str(row["datetime"]))
-                    td = t.timedelta(str(row["timedelta"]))
-                    end = start+td
-                    now = t.datetime()
-                    if end>=now and row["hire"]>-2:
-                        # user is loginning and not logout                
-                        row = user_row
-                    else:
-                        self.add_msg("Base.get_user_row(user=%s):\
-                            end<now or row[hire]<=-2" % str(u))
-                else:
-                    self.add_msg("Base.get_user_row(user=%s):\
-                        len(rows)=0" % str(u))
-            else:
-                self.add_msg("Base.get_user_row(user=%s):account is not\
-                    in user_row." % str(u))
-        else:
-            self.add_msg("Base.get_user_row(user=%s):user_row is None"\
-                % str(u))
-        # change the right user in url
-        if user is None and row is not None:
-            self.urlDict["u"] = str(row["kid"])
-        return row
-    ################################################################
-    # 11 goto jump to the action url of http
-    ################################################################
-    def goto(self,action=None):
-        html = ""
-        html = self.get_templet("goto")
-        if action is None:
-            action = self.get_action()
-        html = html.replace("ilv_url",action)
-        return html
-    ################################################################
-    # 12 get_sup_node
-    ################################################################
-    def get_sup_node(self,sup=None,pre1="",pre2=""):
-        html = ""
-        # 1 加入组合框头
-        if pre1=="" and pre2=="": # 一级标题
-            html += '''
-            <select name=item><!--栏目组合框-->            
-            '''
-        if sup is None:
-            sup = self.get_para("sup")
-        sup_row =self.get_row(aim=sup,sup=self.COLUMN_SUP,name="sup")
-        if sup_row is not None:
-            # 2 搜集子栏目
-            sql = ""
-            sql += " select * from `item`"
-            sql += " where `item`='%s'" % sup
-            sql += " and `level`='1'"
-            sql += " order by `sid` asc"
-            self.db.run()
-            self.db.execute_query(sql)
-            rows = self.db.get_row_dicts()
-            self.db.close()
-            # 3 判断当前选项是否被选择
-            selectedStr = ""
-            if str(sup)==str(self.get_para("sup")):
-                selectedStr = "selected"
-            # 4 加入当前结点
-            if len(rows)>0:
-                html += '''
-                <option value=%s %s>%s◇%s
-                ''' % (sup,selectedStr,pre1+pre2,sup_row["title"])
-            else:
-                html += '''
-                <option value=%s %s>%s◆%s
-                ''' % (sup,selectedStr,pre1+pre2,sup_row["title"])        
-            # 5 设置子结点
-            rowLen = len(rows)
-            rowIdx = 0
-            subpre1 = ""
-            subpre2 = ""
-            for row in rows:
-                rowIdx += 1
-                # 5.1 竖线前缀
-                if pre1=="" and pre2=="": # 一级标题
-                    subpre1 = ""
-                elif pre2=="├": # 其它标题 父亲为中间结点
-                    subpre1 = pre1 + "│"
-                else: # 其它标题 父亲为末尾结点
-                    subpre1 = pre1 + "　" # "┆"
-                # 5.2 分支前缀
-                if rowIdx<rowLen:
-                    subpre2 = "├"
-                else:
-                    subpre2 = "└"                    
-                html += self.get_sup_node(row["kid"],subpre1,subpre2)
-        else:
-            self.add_msg("Base.get_sup_node:sup_row=None,sup=%s,\
-                         pre1=%s,pre2=%s." % (str(sup),pre1,pre2))
-        if pre1=="" and pre2=="":
-            html += '''
-            </select><!--/栏目组合框-->
-            '''
-        return html
-    ####################################################################
-    # III major method
-    ####################################################################
-    ####################################################################
-    # 1 getHtml 网页数据
-    ####################################################################
-    def getHtml(self):
-        html = ""
-        html += self.get_head_htm()        
-        html += self.get_menu_htm()        
-        html += self.getBody()        
-        html += self.getTail()
-        return html
     ####################################################################
     # IV help method
     ####################################################################
@@ -478,16 +48,9 @@ class Base(ilv.Config.Config):
         user_row = self.get_para("user_row")
         # 2 set title 需要拓展
         title = sup_row["title"] + "--" + self.title + " " + self.revision
-        # 3 set style
-        css_head = self.get_path("css/head.css")
-        css_act = self.get_path("css/act.css")
-        css = self.get_path("css/style.css")
-        # 4 read templet
-        html = self.get_templet("head")
+        # 3 read templet
+        html = self.opfile.get_templet("head")
         html = html.replace("ilv_title",title)
-        html = html.replace("ilv_style_head",css_head)
-        html = html.replace("ilv_style_act",css_act)
-        html = html.replace("ilv_style",css)
         html = html.replace("ilv_user",user_row["account"])
         # 5 set control
         html = html.replace("ilv_control",self.get_control_htm())
@@ -498,7 +61,7 @@ class Base(ilv.Config.Config):
     def get_control_htm(self):
         html = ""
         sup_row = self.get_para("sup_row")
-        html = self.get_templet("control")
+        html = self.opfile.get_templet("control")
         html = html.replace("ilv_title",sup_row["title"])
         paras = {}
         paras["act"] = "add"
@@ -544,7 +107,7 @@ class Base(ilv.Config.Config):
             action = self.get_action(paras)
             titles += "|%s" % subRow["title"]
             urls += "|"+action
-        html = self.get_templet("menu")
+        html = self.opfile.get_templet("menu")
         html = html.replace("ilv_titles",titles)
         html = html.replace("ilv_urls",urls)
         # set the first news 头条新闻
@@ -613,7 +176,7 @@ class Base(ilv.Config.Config):
             htmlAction += self.search()
         else:
             #htmlAction += self.view()
-            html = self.get_templet(act)
+            html = self.opfile.get_templet(act)
             if html is None:
                 html = self.view()
             else:
@@ -685,7 +248,7 @@ class Base(ilv.Config.Config):
         aim = self.get_para("aim")
         dtname = self.get_module_row("dtname")["dtname"]
         # paras of form
-        html = self.get_templet(act)
+        html = self.opfile.get_templet(act)
         html = html.replace("ilv_action",self.get_action())
         column_node = self.get_sup_node()
         html = html.replace("ilv_columnNode",column_node)
@@ -834,7 +397,7 @@ class Base(ilv.Config.Config):
         dtname = self.get_module_row("dtname")["dtname"]
         act = self.get_para("act")
         # paras of form
-        html = self.get_templet(act)
+        html = self.opfile.get_templet(act)
         html = html.replace("ilv_action",self.get_action())
         column_node = self.get_sup_node()
         msg = ""
@@ -1017,14 +580,14 @@ class Base(ilv.Config.Config):
         if sup is None:
             sup = self.get_para("sup")
         # 1 load templet file
-        html = self.get_templet("search",sup)
+        html = self.opfile.get_templet("search")
         html = html.replace("ilv_action",self.get_action({"act":"search"}))
         # 2 get dtname
         dtname_row = self.get_module_row("dtname")        
         if dtname_row is not None:
             dtname = dtname_row["dtname"]
             if dtname in self.DT_TABLES:    
-                row_html = self.get_templet("search_row")         
+                row_html = self.opfile.get_templet("search_row")         
                 sql = ""
                 sql += " select * from `%s`" % dtname
                 if dtname==self.dtNews:
@@ -1146,7 +709,7 @@ class Base(ilv.Config.Config):
             dtname = dtname_row["dtname"]
         else:
             dtname = "news"
-        html = self.get_templet("total")
+        html = self.opfile.get_templet("total")
         sql = ""
         sql += " select * from `%s`" % dtname
         sql += " where `item` like '%s%%'" % sup
@@ -1180,7 +743,7 @@ class Base(ilv.Config.Config):
     def getRecent(self):
         html = ""
         sup = self.get_para("sup")
-        recentHtml = self.get_templet("recent")
+        recentHtml = self.opfile.get_templet("recent")
         self.db.run()
         sql = "select * from `news` order by `kid` desc limit 10"
         self.db.execute_query(sql)
@@ -1201,15 +764,12 @@ class Base(ilv.Config.Config):
     def get_tab_htm(self):
         html = ""
         # set right
-        html_right = self.get_templet("tab_right")
-        action = self.get_action({"sup":1023,"act":"view"})
-        html_right = html_right.replace("ilv_zgw_action",action)
         sup = self.get_para("sup")
-        html = self.get_templet("tab")
+        html = self.opfile.get_templet("tab")
         self.db.run()
         sql = ""
         sql += " select * from `%s`" % self.dtColumn
-        sql += " where `level`='1'"
+        sql += " where `level`>='1'"
         sql += " and ("
         sql += " `kid`='1022' or `kid`='1023' or `kid`='1024'"
         sql += " or `%s` like '1025%%')" % self.dtColumn
@@ -1252,7 +812,7 @@ class Base(ilv.Config.Config):
                 </a><br><!--/tab_content_row-->
                 """
             html = html.replace("ilv_tab_content",tab_content,1)
-        return (html_right+html)
+        return (html)
     ##################################################
     # 3、分栏层 subfields 分栏显示
     ##################################################
