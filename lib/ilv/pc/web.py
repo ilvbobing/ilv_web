@@ -42,18 +42,7 @@ class Web(ilv.core.web.Web):
     # 1 getHead get html head
     ####################################################################
     def get_head_htm(self):
-        html = None
-        # 1 set sup user
-        sup_row = self.get_para("sup_row")
-        user_row = self.get_para("user_row")
-        # 2 set title 需要拓展
-        title = sup_row["title"] + "--" + self.title + " " + self.revision
-        # 3 read templet
-        html = self.opfile.get_templet("head")
-        html = html.replace("ilv_title",title)
-        html = html.replace("ilv_user",user_row["account"])
-        # 5 set control
-        html = html.replace("ilv_control",self.get_control_htm())
+        html = ilv.core.web.Web.get_head_htm(self);
         return html 
     ################################################################
     # 1.1 get_control_htm
