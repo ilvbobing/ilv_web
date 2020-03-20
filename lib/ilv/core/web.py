@@ -463,10 +463,12 @@ class Web(ilv.conf.web.Web):
         user_row = self.get_para("user_row")
         # 2 set title 需要拓展
         title = sup_row["title"] + "--" + self.title + " " + self.revision
+        agent = self.env.get_agent();
         # 4 read templet
         html = self.opfile.get_templet("head")
         html = html.replace("ilv_title",title)
         html = html.replace("ilv_user",user_row["account"])
+        html = html.replace("HTTP_USER_AGENT", agent)
         # 5 set control
         html = html.replace("ilv_control",self.get_control_htm())
         return html 
