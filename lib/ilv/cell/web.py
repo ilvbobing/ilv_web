@@ -178,7 +178,7 @@ class Web(ilv.core.web.Web):
             htmlAction += self.search()
         else:
             #htmlAction += self.view()
-            html = self.get_templet(act)
+            html = self.opfile.get_templet(act)
             if html is None:
                 html = self.view()
             else:

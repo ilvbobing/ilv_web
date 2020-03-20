@@ -179,7 +179,7 @@ class Web(ilv.conf.web.Web):
         if paras is None:
             paras = {}
         # simple act aim hire pattern page sup user
-        names = ["act","aim","hire","p","page","sup","u"]
+        names = ["act","aim","hire","p","page","sup","u","plat"]
         for name in names:
             if name in paras:
                 action += "&%s=%s" % (name,str(paras[name]))

@@ -73,7 +73,9 @@ class Opfile:
     ################################################################
     def get_templet(self,name=None):
         html = None
-        path = self.get_path(file_name=name+".html")
+        # print("ilv.core.opfile.Opfile.get_templet:name=%s\r\n<br>" % str(name))
+        file_name = name+".html"
+        path = self.get_path(file_name=file_name)
         if path is not None:
             output = open(path,mode='r',buffering=1)
             data = output.readline()
