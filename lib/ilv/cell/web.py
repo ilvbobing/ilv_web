@@ -49,7 +49,7 @@ class Web(ilv.core.web.Web):
     # 1 getHead get html head
     ####################################################################
     def get_head_htm(self):
-        html ilv.core.web.Web.get_head_htm(self)
+        html = ilv.core.web.Web.get_head_htm(self)
         return html 
       
     ####################################################################
