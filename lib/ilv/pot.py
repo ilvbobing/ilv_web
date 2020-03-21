@@ -23,6 +23,7 @@ def get_web(env=None):
     # 根据用户指定模式确定前台模式
     # =============================
     urlDict = env.getUrlDict()
+    agent = env.get_agent()
     base = None
     if "plat" in urlDict:
         print("index.py,在地址栏中plat="+urlDict["plat"]+"\r\n<br>")
