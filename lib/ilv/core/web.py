@@ -46,6 +46,7 @@ class Web(ilv.conf.web.Web):
         
         """
         # init paras
+        self.plat = "core"
         self.urlDict = env.getUrlDict() # 获取网页地址栏参数
         self.postDict = env.getFormDicts() # 获取网页表单参数
         self.env = env # 获取网页请求环境变量

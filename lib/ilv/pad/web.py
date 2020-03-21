@@ -37,6 +37,7 @@ class Web(ilv.core.web.Web):
         # 父类方法：super(子类，self).__init__(参数1，参数2，....)
         # 经典写法：父类名称.__init__(self,参数1，参数2，...)
         ilv.core.web.Web.__init__(self,env=env)
+        self.plat = "pad"
         
         # init paras
         pass
