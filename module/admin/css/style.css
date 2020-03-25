@@ -1,0 +1,219 @@
+@charset "utf-8";
+/**************************************************
+ *总体布局
+ **************************************************/
+#divTime{
+    display:inline;
+}
+/*顶部标签*/
+#div_topTag{
+  /*width:100%;height:100px;overflow:hidden;text-overflow:ellipsis; 文字溢出不换行，用...表示*/
+  /*display:inline; 强制左右结点在同一行*/
+  width:100%;height:246px;overflow:hidden;
+  text-align:center;
+  color:red;
+  background:#FFFFFF;
+  border-bottom:0px solid #000;
+}
+/**************************************************
+ * 菜单
+**************************************************/
+#divMenu{ /*菜单外框*/
+    width:100%;height:40px;overflow:hidden;
+    border:5px solid #000000;
+    border:0px solid blue;
+}
+#divMenuRow{ /*菜单一行*/
+    width:100%;height:40px; /*军事工作 政治工作 保障工作*/
+    overflow:hidden;text-overflow:ellipsis; /*文字溢出不换行，用...表示*/
+    background:#F0F0F0;
+    float:left;clear:left;
+}
+#div_news_first{
+    position:relative;left:140px;top:0px;
+    width:735;height:50px;overflow:hidden;
+    border:0px solid red;
+    font-size:30px;font-weight:bolder;
+    line-height:170%;
+    color:#DA57DB;
+}
+#divMenuImg{ /*菜单图片*/
+    width:900px;height:50px;overflow:hidden;
+    float:left;clear:left;
+    background-image:url(images/news_first.png);
+}
+.bossEmail{ /*首长信箱*/
+    width:95px;height:80px;overflow:hidden;
+}
+.menuItem{ /*菜单项盒*/
+    /*width:100px;height:20px;overflow:hidden; 定制宽度*/
+    display:inline-block; /*强制相邻结点在同一行*/
+    padding:0px 10px 1px 10px; /*内补丁：上右下左*/
+    text-align:center;
+    border:0px solid blue;
+    font-weight:bold;
+}
+*html .menuItem{ /*IE6菜单项盒*/
+    display:inline;
+}
+*+html .menuItem{ /*IE7菜单项盒*/
+    display:inline;
+}
+.menuItem:hover{ /*菜单项鼠标悬停*/
+    background:url(module/images/nav_hover.gif) no-repeat right center;
+}
+
+/**************************************************
+ * 0、管理层 manage
+**************************************************/
+#div_control{
+    float:left;clear:left;
+    width:20%;overflow:hidden;
+    background:none;
+    color:#FFF;
+}
+#div_control_top{
+    height:18px;overflow:hidden;
+}
+#div_control_title{
+    text-align:center;
+    font-size:18px;line-height:250%;
+    height:40px;overflow:hidden;
+    background:#F0F0F0;
+    color:#060;
+    font-weight:bolder;
+}
+#div_control_content{
+    padding-left:5px;
+    background:#5CBBE0;
+}
+/**************************************************
+ * 2、总览层 total 显示闪耀图片和最近更新记录
+**************************************************/
+#divTotal{
+    width:100%;overflow:hidden;
+    background:#FFF;
+    /*border:1px solid red;*/
+}
+#divShine{
+    float:left;clear:left;
+    width:49%;height:300px;overflow:hidden;
+    overflow:hidden;text-overflow:ellipsis; /*文字溢出不换行，用...表示*/
+    display:inline; /*强制左右结点在同一行*/
+    border:1px solid #BED4EC;
+    text-align:center;
+    padding-top:1px;
+}
+#divRecent{
+    float:right;clear:right;
+    width:50%;height:300px;overflow:hidden;
+    overflow:hidden;text-overflow:ellipsis; /*文字溢出不换行，用...表示*/    
+    display:inline; /*强制左右结点在同一行*/
+    border:1px solid #BED4EC;    
+    text-align:center;
+}
+#divRecentTitle{
+    height:24px;overflow:hidden;
+    background:url(images/bgRecentTitle.jpg);
+    text-align:left;
+    padding-left:20px;
+    padding-top:3px;
+    color:#283A79;
+    font-weight:bold;
+}
+.recentRow{
+    width:98%;overflow:hidden;
+    overflow:hidden;text-overflow:ellipsis; /*文字溢出不换行，用...表示*/
+    border:1px solid #DED1D1;
+    border-style:dotted dotted dotted dotted;/*边框类型上 右 下 左*/
+    border-width:0px 0px 1px 0px;
+}
+.recentRecord{
+    width:84%;overflow:hidden;
+    text-overflow:ellipsis;/*文字溢出不换行，用...表示*/
+    white-space:nowrap; /*中间不换行*/
+    display:inline; /*强制左右结点在同一行*/
+    text-align:left;
+}
+.recentDatetime{
+    width:16%;overflow:hidden;
+    text-overflow:hidden;/*ellipsis;/*文字溢出不换行，用...表示*/
+    white-space:nowrap; /*中间不换行*/
+    display:inline; /*强制左右结点在同一行*/
+}
+/**************************************************
+ * 3、标签层 tab 分部信息
+**************************************************/
+#div_tab{
+    width:800px;height:300px;overflow:hidden;
+    border:1px solid #BED4Ec;
+}
+.tab_menu_hide{
+    display:none;
+}
+.tab_menu_on{
+    width:114px;height:30px;overflow:hidden;
+    text-align:center;
+    display:inline;
+    background:#FFF;
+    border-top:1px solid #DED1D1;   border-right:1px solid #DED1D1;
+    border-bottom:0px solid #DED1D1;border-left:1px solid #DED1D1;
+}
+.tab_menu_off{
+    width:114px;height:30px;overflow:hidden;
+    text-align:center;
+    display:inline;
+    background:#EEE;
+    border-top:1px solid #DED1D1;   border-right:1px solid #DED1D1;
+    border-bottom:1px solid #DED1D1;border-left:1px solid #DED1D1;}
+/**************************************************
+ * 3、分栏层 subfields 显示各下属栏目信息
+**************************************************/
+#divSubfields{
+    width:100%;overflow:hidden;
+    background:#FFFFEE;
+}
+.subLeft{
+    float:left;clear:left;
+    width:49%;height:300px;overflow:hidden;
+    overflow:hidden;text-overflow:ellipsis; /*文字溢出不换行，用...表示*/
+    display:inline; /*强制左右结点在同一行*/
+    border:1px solid #DED1D1;
+}
+.subRight{
+    float:right;clear:right;
+    width:50%;height:300px;overflow:hidden;
+    overflow:hidden;text-overflow:ellipsis; /*文字溢出不换行，用...表示*/    
+    display:inline; /*强制左右结点在同一行*/
+    border:1px solid #DED1D1;
+}
+.subTitle{
+    background-image:url(module/images/menu.jpg);
+    background-repeat:no-repeat;
+    background-position:left;
+    padding:1px 1px 1px 40px; /*内补丁：上 右 下 左*/
+}
+.subRow{ /*单行*/
+    width:100%;overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap; /*中间不换行*/
+    padding:2px 1px 1px 10px; /*内补丁上 右 下 左*/
+}
+
+/***********************************************************************************
+* 3.1.8 join
+***********************************************************************************/
+#divJoinMsg{
+    color:red;
+    font-weight:bold;
+    border:0px solid #000;
+    display:none;
+}
+#divJoinPassword{
+    width:145px;height:20px;overflow:hidden;
+    display:inline;
+    border:1px solid #AAA;
+    background:#FFF;
+}
+
+
