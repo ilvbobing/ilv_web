@@ -637,6 +637,7 @@ class Web(ilv.core.web.Web):
                 for row in rows:
                     tmp_html = row_html
                     if sup==self.COLUMN_SUP:
+                        sup_row = {"title":"首页"}
                         pass
                     else:
                         sup = str(row[self.dtColumn])
@@ -644,7 +645,7 @@ class Web(ilv.core.web.Web):
                     paras["sup"] = sup
                     paras["act"] = "view"
                     action = self.get_action(paras)
-                    tmp_html = tmp_html.replace("ilv_sup_action",action)         
+                    tmp_html = tmp_html.replace("ilv_sup_action",action)      
                     tmp_html = tmp_html.replace("ilv_sup_title",sup_row["title"])
                     paras["aim"] = row["kid"]
                     paras["act"] = "show"
@@ -656,7 +657,7 @@ class Web(ilv.core.web.Web):
                         tmp_html = tmp_html.replace("ilv_title",str(row["account"]))
                         html = html.replace("发布","登录")
                     else:
-                        tmp_html = tmp_html.replace("ilv_title",row["title"])
+                        tmp_html = tmp_html.replace("ilv_title",str(row["title"]))
                     tmp_html = tmp_html.replace("ilv_datetime",str(row["datetime"]))
                     admin_html = ""
                     user_row = self.get_user_row()

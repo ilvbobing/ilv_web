@@ -46,23 +46,44 @@ class Opfile:
     # file_name 加载的文件 默认为 static/core/default/error.htm
     #*******************************************************************
     def get_path(self, file_name="error.htm"):
-        path = ""
-        path += self.dir_static
+        path = "" # 初始化最终返回值
+        
+        # 1. 在指定平台（plat）、指定模块(mode)下找模板文件路径
+        path = self.dir_static
         path += self.plat + "/"
         path += self.mode + "/"
         if os.path.exists(path+file_name):
             path += file_name
             return path
             pass
-        # 从static/core/default/下寻找
-        path = ""
-        path += self.dir_static
+        
+        # 2. 在默认平台(core)、指定模块(mode)下找模板文件路径
+        path = self.dir_static
+        path += "core/"
+        path += self.mode + "/"
+        if os.path.exists(path+file_name):
+            path += file_name
+            return path
+            pass
+            
+        # 3. 在指定平台(plat)、默认模块(default)下找模板文件路径
+        path = self.dir_static
         path += self.plat + "/"
+        path += "default/"
+        if os.path.exists(path+file_name):
+            path += file_name
+            return path
+            pass        
+        
+        # 4. 从static/core/default/下寻找
+        path = self.dir_static
+        path += "core/"
         path += "default/"
         if os.path.exists(path+file_name):
             path += file_name
         else:
             path = "static/core/default/error.htm"
+            print("ilv.core.opfile.get_path:plat=%s,mode=%s,file_name=%s.\r\n<br>" % (self.plat,self.mode,file_name))
         return path
         pass
 

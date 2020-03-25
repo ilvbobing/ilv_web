@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `translation`;
 # 栏目表：
 ########################################################################
 CREATE TABLE `item`(
-   `kid`        INT PRIMARY KEY     NOT NULL,
+   `kid`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
    `sid`        INT                 DEFAULT 0,
    `name`       CHAR(255)           DEFAULT 'news',
   `account`     TEXT, # 3帐号
@@ -60,6 +60,8 @@ CREATE TABLE `item`(
   `timedelta`   TIMESTAMP default '01:00'
 );
 
+# 测试栏目
+INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('1','0','2','测试栏目','www','news','default'); # 内容集中到/www下
 
 # 顶级栏目
 INSERT INTO`item`(`kid`,`item`,`level`,`title`,`name`,`dtname`,`module`)VALUES('10','0','2','首页','www','news','default'); # 内容集中到/www下
