@@ -105,7 +105,7 @@ class Web(ilv.conf.web.Web):
         paras["millisecond"] = t.getMillisecond()
         paras["page"] = "1"
         paras["p"] = "simple" # mode:simple admin
-        paras["sup"] = "10"
+        paras["sup"] = "10111701" # 默认访问公开招考
         paras["sup_row"] = None
         paras["u"] = "1" # user of client
         paras["user_row"] = None
@@ -421,60 +421,113 @@ class Web(ilv.conf.web.Web):
     def get_head_htm(self):
         html = None
         # 1 set sup user
+        # ==============
         sup_row = self.get_para("sup_row")
         user_row = self.get_para("user_row")
         # 2 set title 需要拓展
+        # ====================
         title = sup_row["title"] + "--" + self.title + " " + self.revision
         agent = self.env.get_agent();
         # 4 read templet
+        # ==============
         html = self.opfile.get_templet("head")
         html = html.replace("ilv_title",title)
         html = html.replace("ilv_user",user_row["account"])
         html = html.replace("HTTP_USER_AGENT", agent)
         # 5 set control
-        html = html.replace("ilv_control",self.get_control_htm())
+        # =============
+        html = html.replace("ilv_control_links",self.get_control_htm())
+        # 6 ilv_head_links 设置顶端常用链接
+        # ================================
+        head_links = "&nbsp;"       
+        # 6.1 网站首页
+        # ------------
+        # paras = {"sup":10,"act":"view"}
+        # action = self.get_action(paras)
+        # head_links += "<a href=%s target=_blank>首页</a>&nbsp;" % action
+        # 6.2 新闻中心
+        # ------------
+        paras = {"sup":10111701,"act":"view"}
+        action = self.get_action(paras)
+        head_links += "<a href=%s target=_blank>公开招考</a>&nbsp;" % action
+        # 6.3 模式切换
+        # ------------
+        p = self.get_para(name="p")
+        # 6.3.1 如果当前为浏览模式，可切换为互动模式
+        if p=="simple":
+            paras = {"p":"admin"}
+            action = self.get_action(paras)
+            head_links += "<a href=%s target=_blank>互动模式</a>&nbsp;" % action
+        # 6.3.2 如果当前为互动模式，可切换为浏览模式
+        elif p=="admin":
+            paras = {"p":"simple"}
+            action = self.get_action(paras)
+            head_links += "<a href=%s target=_blank>浏览模式</a>&nbsp;" % action
+        else:
+            pass
+        # 6.4 会员切换
+        # ------------
+        paras = {"sup":1015,"act":"add","aim":1}
+        action = self.get_action(paras)
+        head_links += "<a href=%s target=_blank>会员切换</a>&nbsp;" % action
+        html = html.replace("ilv_head_links",head_links)
+        
         return html 
       
     ####################################################################
     # 1.1 get_control_htm
     ####################################################################
     def get_control_htm(self):
-        html = "ilv.plat.base.Base.get_control_htm<br>"
-        return html
+        control_links = ""
+        sup = self.get_para("sup")
+        # 循环得到上级栏目
+        for i in range(1,10):
+            self.db.run()
+            sup_row = self.db.get_row(dtname=self.dtColumn,kid=sup)
+            self.db.close()
+            paras = {"sup":sup,"act":"view"}
+            action = self.get_action(paras=paras)
+            link = "<a href=%s target=_blank>%s</a>" % (action,sup_row["title"])
+            if i==1:
+                control_links = link
+            else:
+                control_links = link + "→" + control_links
+            # 如果已经到达首页，就跳出循环
+            if int(sup)<=10111701:
+                break
+            # 如果未到达首页，寻找该栏目的上级目录
+            else:
+                sup = sup_row[self.dtColumn]
+        # 在最前方加一个空格
+        control_links = "&nbsp;"+control_links
+        return control_links
 
     ####################################################################
     # 2 get_menu_htm 获得网页菜单
     ####################################################################
     def get_menu_htm(self):
         html = ""
-        sup_row = self.get_para("sup_row")
-        sup = str(sup_row["kid"])
-        # 查阅当前的所有子类
+        sup = self.get_para(name="sup")
+        
+        # 1. 查阅当前的所有子类
+        # ====================
         sql = ""
         sql += " select * from `item`"
         sql += " where `item`='%s'" % sup
         user_row = self.get_user_row()
         # 限制只有admin 可以查看所有栏目
-        if user_row["account"]!="admin":
+        if user_row["level"] < 7:
             sql += " and `level`='1'"
         sql += " order by `sid` asc"
         self.db.run()
         self.db.execute_query(sql)
         subRows = self.db.get_row_dicts()
         self.db.close()
-        paras = {}
-        paras["sup"] = 10
-        paras["act"] = "view"
-        action = self.get_action(paras)
-        # 制作链接，去除脚本
+        
+        # 2. 设置下级菜单
+        # ==============
         menu_links = "&nbsp;"
-        menu_links += "<a href=%s target=_blank>网站首页</a>&nbsp;" % action
-        # 向上找一级
-        if sup!="10":
-            paras["sup"] = sup
-            action = self.get_action(paras)
-            title = sup_row["title"]
-            menu_links += "<a href=%s target=_blank>%s</a>&nbsp;" % (action,title)
+        paras = {"act":"view"}       
         for subRow in subRows:
             paras["sup"] = subRow["kid"]
             action = self.get_action(paras)
@@ -482,7 +535,9 @@ class Web(ilv.conf.web.Web):
             menu_links += "<a href=%s target=_blank>%s</a>&nbsp;" % (action,title)
         html = self.opfile.get_templet("menu")
         html = html.replace("ilv_menu_links",menu_links)
-        # set the first news 头条新闻
+        
+        # 3. set the first news 头条新闻
+        # ==============================
         sql = ""
         sql += " select * from `%s`" % self.dtNews
         sql += " where `hire`>=3"
@@ -510,13 +565,14 @@ class Web(ilv.conf.web.Web):
         # 注意取消注释 不用if
         if user_row:
             user = str(user_row["kid"])
+            user_lev = str(user_row["level"])
         else:
             user = "1"
         pattern = self.get_para("p")
         if user=="1" and pattern=="admin":
             act = "add"
             self.urlDict["act"] = act
-            self.urlDict["sup"] = self.ACTIVE_SUP
+            self.urlDict["sup"] = self.GUEST_SUP
         elif pattern=="admin":
             pass
         elif    act == self.PARAS["act"]:     
@@ -549,6 +605,8 @@ class Web(ilv.conf.web.Web):
             htmlAction += self.edit()
         elif urlDict["act"] == "search":
             htmlAction += self.search()
+        elif urlDict["act"] == "pour":
+            htmlAction += self.pour()
         else:
             #htmlAction += self.view()
             html = self.get_templet(act)
@@ -754,6 +812,8 @@ class Web(ilv.conf.web.Web):
                 self.db.run()
                 self.db.execute(sql)
                 self.db.close()
+                # 变更以后切换为浏览模式
+                paras["p"] = "simple"
         # 3 goto the new html
         if succeed:
             return self.goto(action=self.get_action(paras=paras))
@@ -761,9 +821,10 @@ class Web(ilv.conf.web.Web):
         html = html.replace("ilv_msg",msg)
         return html
         pass
-    ####################################################################################
+
+    ####################################################################
     # 3.1.6 search 查找会员
-    ####################################################################################
+    ####################################################################
     def search(self,sup=None):
         html = ""
         if sup is None:
@@ -887,6 +948,33 @@ class Web(ilv.conf.web.Web):
         
         return html
         pass
+
+    ####################################################################
+    # 3.1.7 pour 注入sql语句
+    ####################################################################
+    def pour(self):
+        # 1 设置观察变量
+        succeed = False # 暂未提交表单
+        if self.postDict is not None and len(self.postDict)>0:
+            succeed = True # 已提交了表单
+        print("ilv.core.web.Web.pour:postDict=%s<br>\r\n" % str(self.postDict))
+        # 2 运行sql语句集
+        if succeed:
+            sqls_str = self.postDict["detail"][0]["value"]
+            self.db.run()
+            self.db.execute_sqls(sqls_str=sqls_str)
+            self.db.close()
+        # 3 goto the new html
+        if succeed:
+            paras = {"act":"view"}
+            return self.goto(action=self.get_action(paras=paras))
+        # 4 显示网页
+        act = self.get_para(name="act")
+        html = self.opfile.get_templet(act)
+        html = html.replace("ilv_action",self.get_action())
+        return html
+        pass
+
     ##################################################
     # 2 getTotal
     ##################################################

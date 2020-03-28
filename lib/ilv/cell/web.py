@@ -56,64 +56,14 @@ class Web(ilv.core.web.Web):
     # 1.1 get_control_htm
     ####################################################################
     def get_control_htm(self):
-        html = "ilv.plat.base.Base.get_control_htm<br>"
+        html = ilv.core.web.Web.get_control_htm(self)
         return html
 
     ####################################################################
     # 2 get_menu_htm 获得网页菜单
     ####################################################################
     def get_menu_htm(self):
-        html = ""
-        sup_row = self.get_para("sup_row")
-        sup = str(sup_row["kid"])
-        # 查阅当前的所有子类
-        sql = ""
-        sql += " select * from `item`"
-        sql += " where `item`='%s'" % sup
-        user_row = self.get_user_row()
-        # 限制只有admin 可以查看所有栏目
-        if user_row["account"]!="admin":
-            sql += " and `level`='1'"
-        sql += " order by `sid` asc"
-        self.db.run()
-        self.db.execute_query(sql)
-        subRows = self.db.get_row_dicts()
-        self.db.close()
-        paras = {}
-        paras["sup"] = 10
-        paras["act"] = "view"
-        action = self.get_action(paras)
-        # 制作链接，去除脚本
-        menu_links = "&nbsp;"
-        menu_links += "<a href=%s target=_blank>网站首页</a>&nbsp;" % action
-        # 向上找一级
-        if sup!="10":
-            paras["sup"] = sup
-            action = self.get_action(paras)
-            title = sup_row["title"]
-            menu_links += "<a href=%s target=_blank>%s</a>&nbsp;" % (action,title)
-        for subRow in subRows:
-            paras["sup"] = subRow["kid"]
-            action = self.get_action(paras)
-            title = subRow["title"]
-            menu_links += "<a href=%s target=_blank>%s</a>&nbsp;" % (action,title)
-        html = self.opfile.get_templet("menu")
-        html = html.replace("ilv_menu_links",menu_links)
-        # set the first news 头条新闻
-        sql = ""
-        sql += " select * from `%s`" % self.dtNews
-        sql += " where `hire`>=3"
-        sql += " order by `datetime` desc"
-        sql += " limit 1"
-        self.db.run()
-        self.db.execute_query(sql)
-        rows = self.db.get_row_dicts()
-        self.db.close()
-        if len(rows)>0:
-            row = rows[0]
-            action = self.get_action({"act":"show","aim":row["kid"]})
-            html = html.replace("ilv_first_action",action)
-            html = html.replace("ilv_first_title",row["title"])
+        html = ilv.core.web.Web.get_menu_htm(self)
         return html
         pass
         
@@ -127,20 +77,14 @@ class Web(ilv.core.web.Web):
         # 注意取消注释 不用if
         if user_row:
             user = str(user_row["kid"])
+            user_lev = str(user_row["level"])
         else:
             user = "1"
         pattern = self.get_para("p")
         if user=="1" and pattern=="admin":
             act = "add"
             self.urlDict["act"] = act
-            self.urlDict["sup"] = self.ACTIVE_SUP
-        elif pattern=="admin":
-            pass
-        elif    act == self.PARAS["act"]:     
-            html += self.getTotal() # 获得总览层 闪动照片 最近更新
-            html += self.get_tab_htm() # get the tab
-            html += self.getSubfields() # 3、分栏层 分栏显示下属栏目更新
-            pass
+            self.urlDict["sup"] = self.GUEST_SUP
         html += self.get_act_htm()
         return html
         pass
@@ -149,37 +93,10 @@ class Web(ilv.core.web.Web):
     # getAct 1.2 操作内容
     ##################################################
     def get_act_htm(self):
-        urlDict = self.urlDict
-        act = self.get_para("act")
-        htmlAction = ""
-        if "act" not in urlDict:
-            htmlAction += self.view() 
-        elif urlDict["act"] == "view":
-            htmlAction += self.view()
-        elif urlDict["act"] == "add":
-            htmlAction += self.add()
-        elif urlDict["act"] == "show":
-            htmlAction += self.show()
-        elif act=="hire":
-            htmlAction += self.hire()
-        elif urlDict["act"] == "edit":
-            htmlAction += self.edit()
-        elif urlDict["act"] == "search":
-            htmlAction += self.search()
-        else:
-            #htmlAction += self.view()
-            html = self.opfile.get_templet(act)
-            if html is None:
-                html = self.view()
-            else:
-                html = html.replace("\r\n","<br>\r\n")
-                html = html.replace("\r","-<br>\r")
-                html = html.replace("\n","--<br>\n")
-            htmlAction += html
-        html = ""
-        html += str(htmlAction)
+        html = ilv.core.web.Web.get_act_htm(self)
         return html
         pass
+
     ############################################################
     # 3.1.1 view 浏览
     ############################################################
@@ -201,186 +118,20 @@ class Web(ilv.core.web.Web):
     # 3.1.4 hire
     ############################################################
     def hire(self,act=None,aim=None,sup=None):
-        if act==None:
-            act = self.get_para("act")
-        aim_row = self.get_aim_row(aim)
-        dtname_row = self.get_module_row("dtname")
-        if dtname_row is not None:
-            dtname = dtname_row["dtname"]
-            if dtname in self.DT_TABLES:
-                key = act
-                value = self.get_para(key)
-                sql = ""
-                sql += " update `%s`" % dtname
-                sql += " set `%s`='%s'" % (key,value)
-                sql += " where `kid`='%s'" % str(aim_row["kid"])
-                sql += " limit 1"
-                self.db.run()
-                self.db.execute(sql)
-                self.db.close()
-            else:
-                self.add_msg("Base.hire(act=%s,aim=%s,sup=%s):\
-                    dtname=%s is not in self.DT_TABLES" \
-                    % (str(act),str(aim),str(sup),str(dtname)))
-        else:
-            self.add_msg("Base.hire(act=%s,aim=%s,sup=%s):\
-                     dtname_row=None." % (str(act),str(aim),str(sup)))
-        action = self.get_action({"act":"view"})
-        return self.goto(action)
+        html = ilv.core.web.Web.hire(self,act=act,aim=aim,sup=sup)
+        return html
+
     ####################################################################
     # 3.1.5 edit 编辑会员
     ####################################################################
     def edit(self):
-        # 1 paras of url
-        paras = {}
-        paras["act"] = self.PARAS["act"]
-        msg = ""
-        act = self.get_para("act")
-        sup = self.get_para("sup")
-        aim = self.get_para("aim")
-        dtname = self.get_module_row("dtname")["dtname"]
-        # paras of form
-        html = self.opfile.get_templet(act)
-        html = html.replace("ilv_action",self.get_action())
-        column_node = self.get_sup_node()
-        html = html.replace("ilv_columnNode",column_node)
-        row = {}
-        if act=="edit" or act=="show":
-            row = self.get_para("aim_row")
-            html = html.replace("selected>",">")
-            html = html.replace("value="+str(row[self.dtColumn])+" ",\
-                "value="+str(row[self.dtColumn])+" selected")
-        if act=="show" and row is not None:
-            if str(row["image"])!="None" and row["image"]!="":
-                html = html.replace("ilv_image",row["image"])
-                html = html.replace("image style=display:none;","image")
-            if str(row["video"])!="None" and row["video"]!="":
-                html = html.replace("ilv_video",row["video"])
-                html = html.replace("video style=display:none;","video")
-        # 0-9 kid sid name account title ip password column icon video
-        # image attach summary detail dtname class module css level hire
-        # hire del datetime millisecond user source coment cite heat score
-        ckeys = [\
-            "kid","sid","name","account","title","ip","password",\
-            "summary","detail","datetime","dtname",\
-            "millisecond",\
-            "sup","act","aim"\
-            ]
-        for ckey in ckeys:
-            cvalue = str(self.get_para(ckey,row))
-            html = html.replace("ilv_"+ckey,cvalue)
-        # check the form
-        succeed = False
-        msg = ""
-        if self.postDict is not None and len(self.postDict)>0:
-            succeed = True
-        # recover the image and video
-        if succeed and act=="edit":
-            # if there is no image upload,donont chanage
-            if "image" in self.postDict and self.postDict["image"][0]["value"]=="":
-                self.postDict["image"][0]["value"] = row["image"]
-            if "video" in self.postDict and self.postDict["video"][0]["value"]=="":
-                self.postDict["video"][0]["value"] = row["video"]
-        # check the account and password of user when login
-        if succeed and sup=="1015" and act=="add":
-            account = self.postDict["account"][0]["value"]
-            password = self.postDict["password"][0]["value"]
-            self.db.run()
-            user_row = self.db.get_row(self.dtUser,account,"account")
-            self.db.close()
-            if user_row is None:
-                msg += "帐号%s不存在。" % account
-                self.add_msg(msg)
-                succeed = False
-            # check the password when account is succeed
-            if succeed:
-                sql = ""
-                sql += " select * from `%s`" % self.dtUser
-                sql += " where `account`='%s'" % account
-                sql += " and `password`='%s'" % password
-                sql += " limit 1"
-                self.db.run()
-                self.db.execute_query(sql)
-                users = self.db.get_row_dicts()
-                if len(users)<1:
-                    msg += "帐号%s与密码不匹配" % account
-                    self.add_msg(msg)
-                    succeed = False
-                else:
-                    paras["u"] = user_row["kid"]
-            self.db.close()
-        # 2 读取表单数据
-        if succeed:
-            html += "<br>"+str(self.postDict)+"<br>"
-        if succeed:
-            keys = self.postDict.keys()
-            values = self.postDict.values()
-            sql = None
-            # 2.1 add record
-            if act=="add":
-                # 2.1.1 check column kid
-                if "kid" in self.postDict:
-                    kid = self.postDict["kid"][0]["value"]
-                    canUse = False
-                    kid = int(self.postDict[self.dtColumn][0]["value"])*100 + int(kid) - 1
-                    while not canUse:
-                        kid += 1
-                        self.db.run()
-                        row = self.db.get_row(dtname,str(kid))
-                        self.db.close()
-                        if row is None:
-                            canUse = True
-                    self.postDict["kid"][0]["value"] = str(kid)
-                # 2.1.2 construct sql                
-                sql = ""
-                sql += " insert into `%s`" % dtname
-                sql += " ("
-                idx = 0
-                for key in keys:
-                    idx += 1
-                    if idx == 1:
-                        sql += "`%s`" % key
-                    else:
-                        sql += ",`%s`" % key
-                sql += " )"
-                sql += "values("
-                idx = 0
-                for value in values:
-                    idx += 1
-                    if idx == 1:
-                        sql += "'%s'" % value[0]["value"]
-                    else:
-                        sql += ",'%s'" % value[0]["value"]
-                sql += " )"             
-            # 2.2 edit record
-            elif act=="edit":
-                sql = ""
-                sql += " update `%s`" % dtname
-                idx = 0
-                for key in self.postDict:
-                    idx += 1
-                    if idx==1:
-                        sql += " set `%s`='%s'" % (key,self.postDict[key][0]["value"]) 
-                    else:
-                        sql += ",`%s`='%s'" % (key,self.postDict[key][0]["value"])
-                sql += " where `kid`='%s'" % row["kid"]
-                sql += " limit 1"
-            # 2.4 write data
-            if sql is not None:
-                html += sql + "<br>"
-                self.db.run()
-                self.db.execute(sql)
-                self.db.close()
-        # 3 goto the new html
-        if succeed:
-            return self.goto(action=self.get_action(paras=paras))
-        # 4 show act html
-        html = html.replace("ilv_msg",msg)
+        html = ilv.core.web.Web.edit(self)
         return html
         pass
-    ####################################################################################
+
+    ####################################################################
     # 3.1.6 search 查找会员
-    ####################################################################################
+    ####################################################################
     def search(self,sup=None):
         html = ""
         if sup is None:
@@ -474,7 +225,9 @@ class Web(ilv.core.web.Web):
                         html = html.replace("发布","登录")
                     else:
                         tmp_html = tmp_html.replace("ilv_title",str(row["title"]))
+                    tmp_html = tmp_html.replace("ilv_summary",str(row["summary"]))
                     tmp_html = tmp_html.replace("ilv_datetime",str(row["datetime"]))
+                    tmp_html = tmp_html.replace("ilv_user",str(row["account"]))
                     admin_html = ""
                     user_row = self.get_user_row()
                     if user_row["account"]=="admin":
@@ -508,41 +261,9 @@ class Web(ilv.core.web.Web):
     # 2 getTotal
     ##################################################
     def getTotal(self):
-        sup = self.get_para("sup")
-        dtname_row = self.get_module_row("dtname")
-        #注意取消注释 不用if
-        if dtname_row:
-            dtname = dtname_row["dtname"]
-        else:
-            dtname = "news"
-        html = self.opfile.get_templet("total")
-        sql = ""
-        sql += " select * from `%s`" % dtname
-        sql += " where `item` like '%s%%'" % sup
-        sql += " and `image` like '%.jpg'"
-        sql += " order by `kid` desc"
-        sql += " limit 5"
-        self.db.run()
-        self.db.execute_query(sql)        
-        rows = self.db.get_row_dicts()
-        self.db.close()
-        idx = 0
-        srcs = ""
-        hrefs = ""
-        titles = ""
-        split = ""
-        for row in rows:
-            idx += 1
-            if idx>1:
-                split = "|"
-            srcs += split + row["image"]
-            hrefs += split + ("/py?sup=%s&act=show&aim=%s" % (sup,row["kid"]))
-            titles += split + row["title"]
-        html = html.replace("ilv_srcs",srcs)
-        html = html.replace("ilv_hrefs",hrefs)
-        html = html.replace("ilv_titles",titles)
-        html = html.replace("ilv_recent",self.getRecent())
+        html = ilv.core.web.Web.getTotal(self)
         return html
+
     ##################################################
     # 2.1 getRecent
     ##################################################

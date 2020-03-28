@@ -1,0 +1,11 @@
+<!--ilv_pour-->
+<!--引用地址：static/core/default/pour.html-->
+<script type=text/javascript src=static/core/default/acs.js></script><!--表单检测插件-->
+<form id=formAdd method=post action=ilv_action enctype=multipart/form-data>
+    <div id=divAddMsg>&nbsp;</div>
+    请填写SQL语句集，注意语法规范
+    <textarea id=divAddDetail name=detail style=width:100%;height:300px;></textarea>
+    <input type=button onclick=jsFormAdd.submit(formAdd); value=提交 />&nbsp;&nbsp;
+    <input type=reset value=清空 />
+</form>
+<!--/ilv_pour-->

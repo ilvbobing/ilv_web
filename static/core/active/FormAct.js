@@ -27,12 +27,16 @@ FormAct.br = "<br>\r\n";
 FormAct.submit = function(form){
     if(!form) form=document.getElementById("form_act");
     succeed = true;
+    msg = "";
     // account
     var accountRe = /^[\w\d_]+$/;
     var account = document.getElementById("input_account");
+    
     if(account){
-        if(account.value.search(accountRe)==-1){
-            msg += "用户帐号不能为空，由字母、数字、下划线组成。"+IlvForm.br;
+        if(account.value.search(accountRe)==-1){            
+            
+            msg += "用户帐号不能为空，由字母、数字、下划线组成。"+FormAct.br;
+            
             succeed = false;
         } else {
             title = document.getElementById("input_title");
@@ -41,16 +45,17 @@ FormAct.submit = function(form){
             }
         }
     }
+    //alert("static/core/FormAct.js:测试是否被调用4，account.value="+account.value);
     // password
-    var passwordRe = /^[\w\d_]*$/;
+    var passwordRe = /^[\w\d_-]*$/;
     var password = document.getElementById("input_password");
     if(password && password.value.search(passwordRe)==-1){
-        msg += "用户密码由字母、数字、下划线组成。"+IlvForm.br;
+        msg += "用户密码由字母、数字、下划线组成。"+FormAct.br;
         succeed = false;
     }
     var password2 = document.getElementById("input_password2");
     if(password2 && password && password2.value != password.value){
-        msg += "两次输入密码不一致。"+IlvForm.br;
+        msg += "两次输入密码不一致。"+FormAct.br;
         succeed = false;
     }
     // title must have one noblank character

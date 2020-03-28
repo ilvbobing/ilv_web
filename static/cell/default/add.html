@@ -1,11 +1,18 @@
 <!--ilv_add-->
-<script type=text/javascript src=static/core/default/acs.js></script><!--表单检测插件-->
+<!---引用地址：static/cell/default/add.html-->
+<script type=text/javascript src=static/cell/default/acs.js></script><!--表单检测插件-->
 <form id=formAdd method=post action=ilv_action enctype=multipart/form-data>
     <div id=divAddMsg>&nbsp;</div>
-    <div id=divAddColumn>所属栏目:ilv_columnNode</div>   
-    <input id=divAddTitle type=text name=title value='' />       
-    <br>  
-    <textarea id=divAddSummary name=summary style=width:100%;height:100px;></textarea>
+    <div id=divAddColumn>
+        所属栏目:ilv_columnNode
+        <select name=hire><!--文本类型-->                     
+            <option value=-1 selected>私密文章
+            <option value=0>推送全网    
+        </select><!--/栏目组合框-->  
+    </div>   
+    <input id=divAddTitle type=text name=title value='' style=width:100%; />       
+    <textarea id=divAddSummary name=summary style=width:100%;height:300px;></textarea>
+
     <div><input type=hidden name=datetime value='ilv_datetime' /></div>
     <input type=button onclick=jsFormAdd.submit(formAdd); value=提交 />&nbsp;&nbsp;
     <input type=reset value=清空 />

@@ -81,6 +81,8 @@ class Web:
     COLUMN_SUP = "1014" # the kid of column in column
     ACTIVE_SUP = "1015" # the column for user to login and logout
     NEWS_SUP = "10"
+    ADMIN_SUP = "10" # 管理员访问
+    GUEST_SUP = "1011170105" # 游客可以提问
     
     # 地址栏中各个参数的名称
     # =====================

@@ -3,12 +3,11 @@
 
 """
 Sumary:
-This is a class of database.
+This is a function for control the plat of web.
 Params           Type                  Explain
-columnNames      list                  The columnName of the table
-data             list                  The data of the table
+env              Env                   The envirent of the client
 摘要：
-这是一个控制数据库的类
+这是一个控制网页平台的方法
 """
 
 import ilv.core.web
@@ -20,13 +19,19 @@ import ilv.pc.web
 # ilv.plat.get_web
 ########################################################################
 def get_web(env=None):
-    # 根据用户指定模式确定前台模式
+
+    # 1. 固定平台：开发者模式
+    # ======================
+    # base = ilv.core.web.Web(env=env)
+    # return base
+    # pass
+    
+    # 2. 根据用户指定模式确定前台模式
     # =============================
     urlDict = env.getUrlDict()
     agent = env.get_agent()
     base = None
     if "plat" in urlDict:
-        print("index.py,在地址栏中plat="+urlDict["plat"]+"\r\n<br>")
         # 2.1 电脑端模式
         # --------------
         if urlDict["plat"]=="pc":
@@ -44,6 +49,7 @@ def get_web(env=None):
             base = ilv.core.web.Web(env=env)
         
     # 3 根据客户端实际情况确定前台模式
+    # ===============================
     else:
         # 3.1 如果有Windows或Linux，则为电脑端
         # -----------------------------------

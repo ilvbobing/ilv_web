@@ -51,30 +51,28 @@ class DB(ilv.conf.db.DB):
         self.col_names = [tuple[0] for tuple in self.cursor.description]
         return self.col_names
         pass           
-        
     #*******************************************************************
-    # 5 导入sql文件
+    # 4 导入sql集
     #*******************************************************************
-    def execute_file(self,path="data/sqlite/setup.sql"):
-        sql_str = ""
-        split_array = None        
-        sql_array = None       
+    def execute_sqls(self,sqls_str=None):
         
-        # 1. 读取SQL语句
-        output = open(path,mode='r',buffering=1)
-        data = output.readline()
-        while data:
-            # 如果是注释语句，直接跳过
-            if data.find("#")==0:
-                data = output.readline()
-                continue
-            split_array = data.split("#",1)
-            sql_str += split_array[0]
-            data = output.readline()
-        # 2. 分割SQL语句
-        sql_array = sql_str.split(";")
+        # 1 逐句去掉注释
+        split_array = None
+        if sqls_str.find("\r\n")!=-1:
+            sql_array = sqls_str.split("\r\n")
+        elif sqls_str.find("\r")!=-1:
+            sql_array = sqls_str.split("\r")
+        elif sqls_str.find("\n")!=-1:
+            sql_array = sqls_str.split("\n")
+        else:
+            print("ilv.core.db.DB.execute_sqls:未找到换行符")
+        sqls_str = ""
+        for sql in sql_array:
+            split_array = sql.split("#",1)
+            sqls_str += split_array[0]
         
-        # 3. 逐条执行SQL语句
+        # 逐条执行SQL语句
+        sql_array = sqls_str.split(";")
         for sql in sql_array:
             ignore = True
             if sql.find("select")!=-1:
@@ -99,10 +97,10 @@ class DB(ilv.conf.db.DB):
                 ignore = False
 
             if not ignore:
-                sql = sql.replace('\r\n','')
-                sql = sql.replace('\r','')
-                sql = sql.replace('\n','')
-                sql = sql.replace('\t','')
+                sql = sql.replace('\r\n',' ')
+                sql = sql.replace('\r',' ')
+                sql = sql.replace('\n',' ')
+                sql = sql.replace('\t',' ')
                 old_sql = sql
                 new_sql = old_sql.replace('  ',' ')
                 while new_sql != old_sql:
@@ -112,8 +110,27 @@ class DB(ilv.conf.db.DB):
                 # sql = sql.replace(x'0a','')
                 print(sql+";\r\n")
                 self.cursor.execute(sql)
-        self.conn.commit()
-        #return sql_str
+        self.conn.commit()        
+        
+    #*******************************************************************
+    # 5 导入sql文件
+    #*******************************************************************
+    def execute_file(self,path="data/sqlite/setup.sql"):
+        sqls_str = ""
+        split_array = None             
+        
+        # 读取SQL语句
+        output = open(path,mode='r',buffering=1)
+        data = output.readline()
+        while data:
+            # 如果是注释语句，直接跳过
+            if data.find("#")==0:
+                data = output.readline()
+                continue
+            split_array = data.split("#",1)
+            sqls_str += split_array[0]
+            data = output.readline()
+        self.execute_sqls(sqls_str=sqls_str)
         
     #*******************************************************************
     # 6 关闭数据库
