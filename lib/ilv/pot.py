@@ -51,17 +51,17 @@ def get_web(env=None):
     # 3 根据客户端实际情况确定前台模式
     # ===============================
     else:
-        # 3.1 如果有Windows或Linux，则为电脑端
+        # 3.1 如果有Windows或Ubuntu，则为电脑端
         # -----------------------------------
-        if "Mobile" in agent:
-            base = ilv.cell.web.Web(env=env)
+        if "Windows" in agent or "Ubuntu" in agent:
+            base = ilv.pc.web.Web(env=env)
         # 3.2 如果有Mobile，则为手机端
-        elif "Android" in agent:
-            base = ilv.pad.web.Web(env=env)
+        elif "Mobile" in agent:
+            base = ilv.cell.web.Web(env=env)
         # 3.3 如果有Android，且没有Mobile，则为平板
         # ----------------------------------------
-        elif "Windows" in agent or "Linux" in agent:
-            base = ilv.pc.web.Web(env=env)
+        elif "Android" in agent:
+            base = ilv.pad.web.Web(env=env)
         # 3.4 其他情况显示默认的文本模式
         # -----------------------------
         else:

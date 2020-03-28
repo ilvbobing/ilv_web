@@ -31,7 +31,6 @@ def  application(environ,start_response):
     # =============
     env = ilv.core.env.Env(environ=environ)
     urlDict = env.getUrlDict()
-    
     base = ilv.pot.get_web(env=env)
     
     ####################################################################
