@@ -56,7 +56,7 @@ def get_web(env=None):
         if "Windows" in agent or "Ubuntu" in agent:
             base = ilv.pc.web.Web(env=env)
         # 3.2 如果有Mobile，则为手机端
-        elif "Mobile" in agent:
+        elif "Mobile" in agent or "Safari" in agent:
             base = ilv.cell.web.Web(env=env)
         # 3.3 如果有Android，且没有Mobile，则为平板
         # ----------------------------------------
