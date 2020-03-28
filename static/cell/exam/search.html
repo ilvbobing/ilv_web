@@ -1,0 +1,57 @@
+<!--ilv_search-->
+<!--引用地址:static/cell/exam/search.html-->
+<div class=hr>&nbsp;</div>
+<div id=div_act>
+<div class=hr>&nbsp;</div>
+<div id=div_act_box>
+    <script type=text/javascript>
+        <!--
+        function search(form){            
+            if(!form){
+                form = document.getElementById("form_search");
+            }
+            succeed = true;
+            msg = ""
+            // 查验身份证
+            svalue1 = document.getElementById("svalue1");
+            if(svalue1){
+                if(svalue1.value==""){
+                    succeed = false;
+                    msg += "身份证号不可为空<br>\r\n";
+                }
+            }
+            // 查验准考证
+            svalue2 = document.getElementById("svalue2");
+            if(svalue2){
+                if(svalue2.value==""){
+                    succeed = false;
+                    msg += "准考证号不可为空<br>\r\n";
+                }
+            }
+            //skey = document.getElementById("skey");
+            //alert(skey.value)
+            if(succeed){
+                form.submit();
+            } else {            
+                //如果检测失败，显示错误信息
+                document.getElementById('divAddMsg').innerHTML = msg;
+                //document.getElementById('divAddMsg').focus();
+                document.getElementById('divAddMsg').style.display = 'block';                   
+            }
+        }
+        //-->
+    </script>
+    <div id=divAddMsg class=msg>&nbsp;</div>
+    <form id=form_search method=post action=ilv_action enctype=multipart/form-data>
+        <input type=hidden name=skey value="account" />身份证号：<input id=svalue1 name=svalue value="" /><br>
+        <input type=hidden name=skey value="password" />准考证号：<input id=svalue2 name=svalue value="" /><br>
+        <input type=button value="搜索" onClick=javascript:search(form_search); />
+        <input type=reset value="清空" />
+    </form>当前准考证号：ilv_svalue
+
+<ilv_row />
+<ilv_page />
+</div><!--/div_act_box-->
+<div class=hr>&nbsp;</div>
+</div><!--/div_act-->
+<!--/ilv_search-->

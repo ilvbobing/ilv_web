@@ -27,21 +27,21 @@ DROP TABLE IF EXISTS `translation`;
 # 栏目表：
 ########################################################################
 CREATE TABLE `item`(
-   `kid`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-   `sid`        INT                 DEFAULT 0,
-   `name`       CHAR(255)           DEFAULT 'news',
+  `kid`         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  `sid`        INT           DEFAULT 0,
+  `name`       CHAR(255)     DEFAULT 'news',
   `account`     TEXT, # 3帐号
   `title`       TEXT, # 4昵称，标题
   `ip`          TEXT, # 5发表IP  
   `password`    TEXT, # 6密码
-  `item`        INT      DEFAULT '13', # 7栏目
+  `item`        INT          DEFAULT '13', # 7栏目
   `icon`        TEXT, # 8头像
   `video`       TEXT, # 9视频
   `image`       TEXT, # 10图片
   `attach`      TEXT, # 11附件
   `summary`     TEXT, # 12简介
   `detail`      TEXT, # 13详情
-  `dtname`      TEXT, # 14数据表
+  `dtname`      CHAR(255)    DEFAULT 'news', # 14数据表
   `class`       CHAR(255)    DEFAULT 'News', # 15操作类
   `module`      CHAR(255)    DEFAULT 'default', # 16模块
   `css`         CHAR(255)    DEFAULT '', # 17样式表位置
@@ -112,7 +112,7 @@ INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('10111701','101117','公开
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('1011170101','10111701','当前关注','news');
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('1011170102','10111701','通知公告','news');
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('1011170103','10111701','规范须知','news');
-INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('1011170104','10111701','审核进度','news');
+INSERT INTO`item`(`kid`,`item`,`title`,`name`,`module`)VALUES('1011170104','10111701','审核进度','news','exam');
 INSERT INTO`item`(`kid`,`item`,`title`,`name`)VALUES('1011170105','10111701','答疑解惑','news');
 
 ########################################################################
@@ -267,6 +267,10 @@ INSERT INTO`news`(`kid`,`item`,`title`,`user`,`hire`,`image`)VALUES('33','102101
 INSERT INTO`news`(`kid`,`item`,`title`,`user`,`hire`,`image`)VALUES('34','102101','图片信息34','2','3','/upload/image/4.jpg');
 INSERT INTO`news`(`kid`,`item`,`title`,`user`,`hire`,`image`)VALUES('35','102101','图片信息35','2','3','/upload/image/5.jpg');
 
+# 审核进度
+INSERT INTO`news`(`kid`,`item`,`title`,`account`,`password`,`summary`,`hire`)VALUES('41','1011170104','笔试成绩','123456123456781234','20201234567890','68','-1');
+INSERT INTO`news`(`kid`,`item`,`title`,`account`,`password`,`summary`,`hire`)VALUES('42','1011170104','网上资格审核','123456123456781234','20201234567890','不合格','-1');
+INSERT INTO`news`(`kid`,`item`,`title`,`account`,`password`,`hire`)VALUES('51','1011170104','笔试成绩','12345612345678123X','2020123456789X','-1');
 
 ########################################################################
 # 图片表：
