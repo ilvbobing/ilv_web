@@ -13,7 +13,6 @@ jsFormAdd = {}
  * jsAddForm.submit 提交表单方法
 ***********************************************************************/
 jsFormAdd.submit = function(form){
-  alert("static/cell/default/acs.js:form="+form);
   if(form == null){
 	  form = document.getElementById("formAdd");
   }

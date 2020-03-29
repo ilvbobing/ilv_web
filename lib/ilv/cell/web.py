@@ -152,6 +152,8 @@ class Web(ilv.core.web.Web):
         html = html.replace("ilv_action",self.get_action({"act":"search"}))
         row_html = self.opfile.get_templet(name="search_row") 
         u = self.get_para(name="u") # 访问会员kid
+        user_row = self.get_para(name="user_row")
+        user_level = user_row["level"]
         sup = self.get_para(name="sup")
         sup_row = self.get_para(name="sup_row")
         dtname = sup_row["dtname"]
@@ -166,7 +168,10 @@ class Web(ilv.core.web.Web):
             # 如果是对会员、新闻进行管理，查看当前栏目下记录信息
             sql += "where `%s` like '%%%s%%'" % (self.dtColumn,sup)
         # 1.3.3 设置录用状态
-        if skey_num==0:
+        if user_level>=7:
+            # 如果是管理员，则显示所有记录
+            sql += "and `hire`>=-2"
+        elif skey_num==0:
             # 如果未提交，正常显示信息，不显示私有信息
             sql += "and `hire`>0"
         elif skey_num==1:
@@ -274,8 +279,8 @@ class Web(ilv.core.web.Web):
             tmp_html = tmp_html.replace("ilv_datetime",str(row["datetime"]))
             tmp_html = tmp_html.replace("ilv_user",str(row["account"]))
             admin_html = ""
-            user_row = self.get_user_row()
-            if user_row["account"]=="admin":
+            # 如果是管理员，则显示控制按钮
+            if user_level>=7:
                 paras["act"] = "edit"
                 admin_html += "<a href=%s>编辑</a>&nbsp;" % self.get_action(paras)
                 paras["act"] = "hire"
