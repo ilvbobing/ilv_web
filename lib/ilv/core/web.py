@@ -186,6 +186,7 @@ class Web(ilv.conf.web.Web):
             self.add_msg("Base.get_module_row:idx=11,name=%s,sup=%s"\
                          % (str(name),str(sup)))
         return row
+
     ################################################################
     # 6 get_row example:102222 1014 sup
     ################################################################
@@ -263,6 +264,7 @@ class Web(ilv.conf.web.Web):
             self.add_msg("Base.get_user_row(user=%s):row=%s" % (str(u),str(row)))
         self.db.close()
         return row
+
     ################################################################
     # 10 get_user_row
     ################################################################
@@ -322,6 +324,7 @@ class Web(ilv.conf.web.Web):
         if user is None and row is not None:
             self.urlDict["u"] = str(row["kid"])
         return row
+
     ################################################################
     # 11 goto jump to the action url of http
     ################################################################
@@ -332,6 +335,7 @@ class Web(ilv.conf.web.Web):
             action = self.get_action()
         html = html.replace("ilv_url",action)
         return html
+
     ################################################################
     # 12 get_sup_node
     ################################################################
@@ -397,6 +401,7 @@ class Web(ilv.conf.web.Web):
             </select><!--/栏目组合框-->
             '''
         return html
+
     ####################################################################
     # III major method
     ####################################################################
@@ -475,7 +480,8 @@ class Web(ilv.conf.web.Web):
         return html 
       
     ####################################################################
-    # 1.1 get_control_htm
+    # 1.1 get_control_htm 控制栏目
+    # 加入当前栏目路径，如：公开招考→答疑解惑
     ####################################################################
     def get_control_htm(self):
         control_links = ""
@@ -515,8 +521,9 @@ class Web(ilv.conf.web.Web):
         sql += " select * from `item`"
         sql += " where `item`='%s'" % sup
         user_row = self.get_user_row()
+        user_level = user_row["level"]
         # 限制只有admin 可以查看所有栏目
-        if user_row["level"] < 7:
+        if user_level < 7:
             sql += " and `level`='1'"
         sql += " order by `sid` asc"
         self.db.run()
@@ -552,8 +559,26 @@ class Web(ilv.conf.web.Web):
             action = self.get_action({"act":"show","aim":row["kid"]})
             html = html.replace("ilv_first_action",action)
             html = html.replace("ilv_first_title",row["title"])
+        
+        # 4. admin option 管理控制选项，如添加、注入sql
+        admin_html = ""
+        paras["sup"] = "10111701" # 公开招考栏目
+        # 管理员可以使用添加选项
+        if user_level>=7:
+            paras["act"] = "add"
+            admin_html += "<a href=%s>添加文章</a>&nbsp;" % self.get_action(paras)
+        # admin可以使用注入选项
+        if user_level>=8: 
+            paras["act"] = "pour"
+            admin_html += "<a href=%s>注入数据</a>&nbsp;" % self.get_action(paras)
+            paras["act"] = "hire"
+        # 如果是管理员登记，添加外包
+        if admin_html != "":
+            admin_html = "<div class=hr>&nbsp;</div>&nbsp;"+admin_html
+        html = html.replace("<ilv_admin_option />", admin_html)
+        
+        # 5. 返回网页代码
         return html
-        pass
         
     ####################################################################
     # 3 getBody 网页主体
@@ -569,6 +594,7 @@ class Web(ilv.conf.web.Web):
         else:
             user = "1"
         pattern = self.get_para("p")
+        # 如果是一般用户进入互动模式，只能停留在游客栏目下
         if user=="1" and pattern=="admin":
             act = "add"
             self.urlDict["act"] = act
@@ -582,7 +608,6 @@ class Web(ilv.conf.web.Web):
             pass
         html += self.get_act_htm()
         return html
-        pass
 
     ##################################################
     # getAct 1.2 操作内容
@@ -620,24 +645,25 @@ class Web(ilv.conf.web.Web):
         html = ""
         html += str(htmlAction)
         return html
-        pass
+        
     ############################################################
     # 3.1.1 view 浏览
     ############################################################
     def view(self):
         return self.search()
-        pass
+        
     ############################################################
     # 3.1.2 add
     ############################################################
     def add(self):
         return self.edit()
+        
     ############################################################
     # 3.1.3 show
     ############################################################
     def show(self):
         return self.edit()
-        pass
+        
     ############################################################
     # 3.1.4 hire
     ############################################################
@@ -668,6 +694,7 @@ class Web(ilv.conf.web.Web):
                      dtname_row=None." % (str(act),str(aim),str(sup)))
         action = self.get_action({"act":"view"})
         return self.goto(action)
+ 
     ####################################################################
     # 3.1.5 edit 编辑会员
     ####################################################################

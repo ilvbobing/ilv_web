@@ -103,17 +103,19 @@ class Web(ilv.core.web.Web):
     def view(self):
         return self.search()
         pass
+
     ############################################################
     # 3.1.2 add
     ############################################################
     def add(self):
         return self.edit()
+
     ############################################################
     # 3.1.3 show
     ############################################################
     def show(self):
         return self.edit()
-        pass
+        
     ############################################################
     # 3.1.4 hire
     ############################################################
@@ -131,6 +133,8 @@ class Web(ilv.core.web.Web):
 
     ####################################################################
     # 3.1.6 search 查找会员 对ilv.core.web.Web.search进行了重写
+    # 主要添加了身份证号、准考证号功能
+    # 当会员用此功能时，可以查询所有对应记录
     ####################################################################
     def search(self,sup=None):
         html = "" # 需要返回的变量
@@ -177,7 +181,9 @@ class Web(ilv.core.web.Web):
         elif skey_num==1:
             # 如果只有一个关键字，显示公众信息、会员所属信息
             sql += "and (`hire`>0 or `user`='%s' )" % u
-        else:
+        # 若skey_num=2,两个关键字分别为身份证号、准考证号
+        # 此项功能可以拓展到其它需要两个关键字查询的情况
+        else: 
             # 如果是查询审核进度，显示私有信息
             sql += "and `hire`=-1"
         # 1.3.4 设置查询变量
@@ -196,6 +202,8 @@ class Web(ilv.core.web.Web):
             skey = self.postDict["skey"][1]["value"]
             svalue = self.postDict["svalue"][1]["value"]
             sql += " and `%s`='%s' " % (skey,svalue)  
+        # 按时间排序
+        sql += " order by `datetime` DESC"
         # 设置当前关键字  
         html = html.replace("ilv_svalue",str(svalue))
         
@@ -284,7 +292,7 @@ class Web(ilv.core.web.Web):
                 paras["act"] = "edit"
                 admin_html += "<a href=%s>编辑</a>&nbsp;" % self.get_action(paras)
                 paras["act"] = "hire"
-                hires = ["删除","隐藏","未审","普通","优质","头条"]
+                hires = ["删除","私有","投稿","采用","优质","头条"]
                 paras["hire"] = -3
                 for hire in hires:
                     paras["hire"] += 1
@@ -298,183 +306,22 @@ class Web(ilv.core.web.Web):
         html = html.replace("<ilv_page />",page_html)
 
         return html
-        pass
-    ##################################################
-    # 2 getTotal
-    ##################################################
-    def getTotal(self):
-        html = ilv.core.web.Web.getTotal(self)
-        return html
 
-    ##################################################
-    # 2.1 getRecent
-    ##################################################
-    def getRecent(self):
-        html = ""
-        sup = self.get_para("sup")
-        recentHtml = self.opfile.get_templet("recent")
-        self.db.run()
-        sql = "select * from `news` order by `kid` desc limit 10"
-        self.db.execute_query(sql)
-        rows = self.db.get_row_dicts()
-        self.db.close()
-        for row in rows:
-            tmpStr = recentHtml
-            action = self.get_action({"sup":sup,"act":"show","aim":row["kid"]})
-            tmpStr = tmpStr.replace("ilv_action",action)
-            tmpStr = tmpStr.replace("ilv_title",row["title"])
-            tmpStr = tmpStr.replace("ilv_datetime",str(row["datetime"]))
-            html += tmpStr
+    ####################################################################
+    # 3.1.7 pour 注入sql语句
+    ####################################################################
+    def pour(self):
+        html = ilv.core.web.Web.pour(self)
         return html
-        pass
-    ##################################################
-    # 2 get_tab_htm
-    ##################################################
-    def get_tab_htm(self):
-        html = ""
-        sup = self.get_para("sup")
-        html = self.opfile.get_templet("tab")
-        self.db.run()
-        sql = ""
-        sql += " select * from `%s`" % self.dtColumn
-        sql += " where `level`>='1'"
-        sql += " and ("
-        sql += " `kid`='1022' or `kid`='1023' or `kid`='1024'"
-        sql += " or `%s` like '1025%%')" % self.dtColumn
-        sql += " order by `kid` asc"
-        sql += " limit 10"
-        # print("ilv.core.web.Web.get_tab_htm:sql="+sql+"\r\n<br>")
-        self.db.execute_query(sql)
-        rows = self.db.get_row_dicts()
-        # print("ilv.core.web.Web.get_tab_htm:rows="+str(rows)+"\r\n<br>")
-        self.db.close()
-        rowIdx = 0
-        paras = {}
-        for row in rows:
-            rowIdx += 1
-            paras["sup"] = row["kid"]
-            paras["act"] = "view"
-            action = self.get_action(paras)
-            if rowIdx==1:
-                html = html.replace("tab_menu_hide","tab_menu_on",1)
-            else:
-                html = html.replace("tab_menu_hide","tab_menu_off",1)
-            html = html.replace("ilv_menu_action",action,1)
-            html = html.replace("ilv_menu_title",row["title"],1)
-            sql = ""
-            sql += " select * from `news`"
-            sql += " where `item` like '%s%%'" % row["kid"]
-            sql += " order by `kid` desc"
-            sql += " limit 10"
-            self.db.run()
-            self.db.execute_query(sql)            
-            news_rows = self.db.get_row_dicts()
-            self.db.close()
-            tab_content = ""
-            for news_row in news_rows:
-                paras["act"] = "show"
-                paras["aim"] = news_row["kid"]
-                tab_content += """
-                <a href=%s target=_blank>
-                """ % self.get_action(paras=paras)
-                tab_content += news_row["title"]
-                tab_content += """
-                </a><br><!--/tab_content_row-->
-                """
-            html = html.replace("ilv_tab_content",tab_content,1)
-        return (html)
-    ##################################################
-    # 3、分栏层 subfields 分栏显示
-    ##################################################
-    def getSubfields(self):
-        html = ""
-        html += '''
-        <!--3、分栏层 subfields-->
-        <div id=divSubfields>
-        '''
-        sup = self.PARAS["sup"]
-        if self.urlDict and "sup" in self.urlDict and self.urlDict["sup"]:
-            sup = self.urlDict["sup"]
-        self.db.run()
-        sql = ""
-        sql += " select * from `item`"
-        sql += " where `item`='%s'" % sup
-        sql += " and `level`='1'"
-        sql += " order by `sid` asc"
-        sql += " limit 6"
-        self.db.execute_query(sql)
-        rows = self.db.get_row_dicts()
-        self.db.close()
-        idx = 0
-        for row in rows:
-             idx += 1
-             # html += "总栏目号："+sup+"。<br>"
-             subClass = "subLeft"
-             if idx%2==0:
-                 subClass = "subRight"
-             action = self.get_action({"sup":row["kid"],"act":"view"})
-             html += '''
-             <!--3.0 单个分栏-->
-             <div class=%s>
-                 <div class=subTitle>
-                     <font color=red>★</font>
-                     <a href=%s><font color=#FFFFFF>%s</font></a>
-                 </div>
-                 %s
-             </div>
-             <!--3.0 单个分栏-->
-             ''' % (subClass,action,row["title"],self.getSubfield(row))            
-        html += '''
-        </div>
-        <!--/3、分栏层 subfields-->
-        '''
-        return html
-        pass
-    ##################################################
-    # 3.0、单个分栏 getSubfield
-    ##################################################
-    def getSubfield(self,row=None):
-        html = ""
-        if row==None:
-            return "单个分栏中row为None"
-        sup = row["kid"] # 获得需要查阅的栏目kid
-        name = "news"
-        self.db.run()
-        sql = ""
-        sql += " select * from `%s`" % name
-        sql += " where `item` like '%s%%'" % sup
-        sql += " and `level`='1'"
-        sql += " order by `datetime` desc"
-        sql += " limit 10"
-        # html += "<div class=rowSolid>sql语句为："+sql+"。</div>"
-        self.db.execute_query(sql)
-        rows = self.db.get_row_dicts()
-        self.db.close()
-        for row in rows:
-            kid = row["kid"]
-            sup = row[self.dtColumn]
-            action = self.get_action({"sup":sup,"act":"show","aim":kid})
-            html += '''
-                <div class=subRow><!--第二行右栏行-->★
-                    <a href=%s target=_blank><!--记录显示链接-->                    
-                        %s                    
-                    </a><!--/记录显示链接-->
-                </div><!--/第二行右栏行-->            
-            ''' % (action,row["title"])        
-        return html
-        pass
+    
     ##################################################
     # htmlTail 网页尾
     ##################################################
     def getTail(self):
-        htmlTail = """
-        %s
-        </div></center><!--/最外层边框-->
-        <div style=height:5px;>&nbsp;</div>
-        </body>
-        </html>
-        """ % self.msg
-        return htmlTail        
+        html = ilv.core.web.Web.getTail(self)
+        return html
+
+
 
 
 
