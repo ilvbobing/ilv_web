@@ -82,7 +82,7 @@ class Web:
     ACTIVE_SUP = "1015" # the column for user to login and logout
     NEWS_SUP = "10"
     ADMIN_SUP = "10" # 管理员访问
-    GUEST_SUP = "1011170105" # 游客可以提问文职招考栏目
+    GUEST_SUP = "10111701" # 游客可以提问文职招考栏目
     
     # 地址栏中各个参数的名称
     # =====================

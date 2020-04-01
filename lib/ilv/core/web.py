@@ -843,6 +843,7 @@ class Web(ilv.conf.web.Web):
                 paras["p"] = "simple"
         # 3 goto the new html
         if succeed:
+            paras["sup"] = self.GUEST_SUP
             return self.goto(action=self.get_action(paras=paras))
         # 4 show act html
         html = html.replace("ilv_msg",msg)
