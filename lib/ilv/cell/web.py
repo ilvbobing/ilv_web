@@ -299,6 +299,9 @@ class Web(ilv.core.web.Web):
                     action = self.get_action(paras)
                     if row["hire"]==paras["hire"]:
                         admin_html += "%s&nbsp;" % hire
+                        # 如果是私有文章，则不显示投稿、采用、优质、头条选项
+                        if row["hire"]==-1:
+                            break;
                     else:
                         admin_html += "<a href=%s>%s</a>&nbsp;" % (action,hire)
             tmp_html = tmp_html.replace("ilv_admin",admin_html)
